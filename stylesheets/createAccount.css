@@ -1,0 +1,65 @@
+/* Grundstil für das Formular */
+form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Stil für die Labels */
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+/* Responsive Eingabefelder */
+input {
+  width: 100%; /* Nutzt die volle Breite des Containers */
+  padding: 10px 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box; /* Wichtig: Stellt sicher, dass Padding innen liegt */
+}
+
+/* Fokus-Stil für Eingabefelder */
+input:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+}
+
+/* Stil für Buttons */
+button {
+  padding: 10px 15px;
+  margin-right: 10px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button[type="reset"] {
+  background-color: #ccc;
+  color: #333;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+/* Responsive Design für verschiedene Bildschirmgrößen */
+@media (max-width: 480px) {
+  form {
+    padding: 10px;
+  }
+  
+  button {
+    width: 100%;
+    margin-bottom: 10px;
+    margin-right: 0;
+  }
+}
