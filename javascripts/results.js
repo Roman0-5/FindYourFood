@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("results-container");
 
+
   // 1. URL-Parameter auslesen
   const params = new URLSearchParams(window.location.search);
   const query = params.get("query") || "";
@@ -42,8 +43,10 @@ document.addEventListener("DOMContentLoaded", () => {
         container.appendChild(element);
       });
     })
+
     .catch(err => {
       console.error("API Error:", err);
       container.innerHTML = "<p>Something went wrong while loading results.</p>";
     });
 });
+

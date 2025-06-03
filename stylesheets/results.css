@@ -1,3 +1,10 @@
+@media (max-width: 480px) {
+    .result-card {
+        padding: 10px;
+        font-size: 0.9rem;
+        background-color: #fff0e6; /* andere Farbe für mobile */
+    }
+}
 body {
     display: flex;
     flex-direction: column;

@@ -1,31 +1,68 @@
+// === Fertige server.js ===
 import express from 'express';
 import fetch from 'node-fetch';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import session from 'express-session';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerDocument } from './swagger.js';
 
-// ⛓️ Damit __dirname funktioniert (da es in ESM nicht existiert)
+// Für __dirname in ES-Modulen
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = 3000;
 
-// Statische Pfade setzen
+// === Session Management ===
+app.use(session({
+  secret: 'mySecretKey',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // In dev okay
+}));
+
+app.post('/login', express.json(), (req, res) => {
+  const { username, password } = req.body;
+  if (username === 'admin' && password === 'pass') {
+    req.session.user = { name: 'admin' };
+    res.json({ message: 'Login erfolgreich' });
+  } else {
+    res.status(401).json({ message: 'Login fehlgeschlagen' });
+  }
+});
+
+app.post('/logout', (req, res) => {
+  req.session.destroy();
+  res.json({ message: 'Logout erfolgreich' });
+});
+
+app.get('/session-check', (req, res) => {
+  if (req.session.user) {
+    res.json({ loggedIn: true, user: req.session.user });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
+
+// === Swagger UI ===
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// === Statische Dateien ===
 app.use(express.static(path.join(__dirname, 'htmls')));
 app.use('/stylesheets', express.static(path.join(__dirname, 'stylesheets')));
 app.use('/javascripts', express.static(path.join(__dirname, 'javascripts')));
 
-// Startseite
+// === HTML-Seiten Routing ===
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'htmls', 'StartSite.html'));
 });
 
-//  Ergebnisseite
 app.get('/Results.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'htmls', 'Results.html'));
 });
 
-// Such-Endpoint wie in Swagger definiert
+// === API Endpoint ===
 app.get('/search', async (req, res) => {
   const { query, city, category, limit = 5, openingHours = "any" } = req.query;
 
@@ -46,12 +83,8 @@ app.get('/search', async (req, res) => {
   }
 });
 
-// 💡 Leitet automatisch auf die Startseite um!
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "htmls", "StartSite.html"));
-});
-
 // Server starten
 app.listen(PORT, () => {
-  console.log(`Server läuft unter: http://localhost:${PORT}`);
+  console.log(`\n✅ Server läuft unter: http://localhost:${PORT}`);
+  console.log(`📚 Swagger-Doku: http://localhost:${PORT}/api-docs`);
 });
