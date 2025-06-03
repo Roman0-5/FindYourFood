@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - FindYourFood</title>
+  <link rel="stylesheet" href="../stylesheets/createAccount.css" />
+</head>
+<body>
+<form id="login-form">
+  <h1>Login</h1>
+  <label for="username">Username</label>
+  <input type="text" id="username" name="username" required />
+
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" required />
+
+  <button type="submit">Login</button>
+  <button type="button" onclick="logout()">Logout</button>
+</form>
+
+<script>
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const result = await res.json();
+    alert(result.message);
+
+    if (res.ok) {
+      window.location.href = 'indexLoggedIn.html';
+    }
+  });
+
+  async function logout() {
+    const res = await fetch('/logout', { method: 'POST' });
+    const result = await res.json();
+    alert(result.message);
+  }
+</script>
+</body>
+</html>

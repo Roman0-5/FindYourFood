@@ -1,82 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>FindYourFood - Home</title>
-        <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="../stylesheets/StartSite.css">
-        <script type="module" src="../javascripts/main.js" defer></script>
-    </head>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FindYourFood - Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../stylesheets/StartSite.css" />
+    <script type="module" src="../javascripts/main.js" defer></script>
+    <style>
+        nav.main-nav {
+            background-color: #70311C;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        nav.main-nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav.main-nav li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav.main-nav li a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            nav.main-nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            nav.main-nav ul {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            nav.main-nav li a {
+                padding: 10px 0;
+                display: block;
+                width: 100%;
+            }
+
+            .guest-search h2 {
+                font-size: 6vw;
+            }
+        }
+    </style>
+</head>
 <body>
-    <header class="branding">
-        <h1 class="headline">
-            <span class="highlight">Find</span>
-            <span class="your">Your</span>
-            <span class="highlight block">Food</span>
-        </h1>
-        <p class="slogan">
-            <span class="subtle">Less</span> 
-            <span class="action">scrolling</span>. 
-            <span class="subtle">More</span> 
-            <span class="action">eating</span>.
-        </p>
-    </header>
+<nav class="main-nav">
+    <ul>
+        <li><a href="StartSite.html">Home</a></li>
+        <li><a href="login.html">Login</a></li>
+    </ul>
+</nav>
 
-    <main>
-<section class="guest-search">
-    <h2>Quick Search – No Account Needed!</h2>
-    <form class="search-form">
-        <input type="text" name="query" placeholder="Search by restaurant name, dish or keyword" required>
-        <input type="text" name="city" placeholder="Enter city (e.g., Vienna)" required>
+<header class="branding">
+    <h1 class="headline">
+        <span class="highlight">Find</span>
+        <span class="your">Your</span>
+        <span class="highlight block">Food</span>
+    </h1>
+    <p class="slogan">
+        <span class="subtle">Less</span>
+        <span class="action">scrolling</span>.
+        <span class="subtle">More</span>
+        <span class="action">eating</span>.
+    </p>
+</header>
 
-        <div class="form-group">
-            <label for="openingHours">Opening Hours:</label>
-            <select name="openingHours" id="openingHours">
-                <option value="any">Any Time</option>
-                <option value="openNow">Open Now</option>
-                <option value="nextSevenDays">Open in the Next 7 Days</option>
-                <option value="weekends">Open on Weekends</option>
-            </select>
-        </div>       
-        
-    <div class="form-group">
-        <label for="category">Category:</label>
-        <select name="category" id="category">
-                <option value="">Any</option>
-                <option value="7315025">Italian</option>
-                <option value="7315017">French</option>
-                <option value="7315031">Asian</option>
-                <option value="7315018">Chinese</option>
-                <option value="7315019">Japanese</option>
-                <option value="7315020">Mexican</option>
-                <option value="7315021">Indian</option>
-                <option value="7315022">Thai</option>
-                <option value="7315023">Vegetarian / Vegan</option>
-                <option value="7315024">Fast Food</option>
-                <option value="7315032">Seafood</option>
-                <option value="7315026">Café / Bakery</option>
-        </select>
-    </div>
+<main>
+    <section class="guest-search">
+        <h2>Quick Search – No Account Needed!</h2>
+        <form class="search-form">
+            <input type="text" name="query" placeholder="Search by restaurant name, dish or keyword" required />
+            <input type="text" name="city" placeholder="Enter city (e.g., Vienna)" required />
 
-    <div class="form-group">
-        <label for="limit">Results Limit:</label>
-        <input type="number" name="limit" id="limit" value="5" min="1" max="50">
-    </div>
+            <div class="form-group">
+                <label for="openingHours">Opening Hours:</label>
+                <select name="openingHours" id="openingHours">
+                    <option value="any">Any Time</option>
+                    <option value="openNow">Open Now</option>
+                    <option value="nextSevenDays">Open in the Next 7 Days</option>
+                    <option value="weekends">Open on Weekends</option>
+                </select>
+            </div>
 
-        <button type="submit">Search Now</button>
-    </form>
-</section>
-    </main>
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <select name="category" id="category">
+                    <option value="">Any</option>
+                    <option value="7315025">Italian</option>
+                    <option value="7315017">French</option>
+                    <option value="7315031">Asian</option>
+                    <option value="7315018">Chinese</option>
+                    <option value="7315019">Japanese</option>
+                    <option value="7315020">Mexican</option>
+                    <option value="7315021">Indian</option>
+                    <option value="7315022">Thai</option>
+                    <option value="7315023">Vegetarian / Vegan</option>
+                    <option value="7315024">Fast Food</option>
+                    <option value="7315032">Seafood</option>
+                    <option value="7315026">Café / Bakery</option>
+                </select>
+            </div>
 
-    <footer>
-        <ul class="footer-nav">
-            <li><a href="about.html">About Us</a></li>
-            <li><a href="imprint.html">Imprint</a></li>
-            <li><a href="privacy.html">Privacy Policy</a></li>
-            <li><a href="contact.html">Contact</a></li>
+            <div class="form-group">
+                <label for="limit">Results Limit:</label>
+                <input type="number" name="limit" id="limit" value="5" min="1" max="50" />
+            </div>
 
-        </ul>
-    </footer>
+            <button type="submit">Search Now</button>
+        </form>
+    </section>
+</main>
+
+<footer>
+    <ul class="footer-nav">
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="imprint.html">Imprint</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+</footer>
 </body>
 </html>
