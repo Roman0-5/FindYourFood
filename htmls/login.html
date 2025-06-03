@@ -6,14 +6,62 @@
     <title>Login - FindYourFood</title>
     <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../stylesheets/login.css">
+    <link rel="stylesheet" href="../stylesheets/accountDropdown.css">
+    <script src="../javascripts/accountDropdown.js" defer></script>
 </head>
 <body>
-    <!-- Navigation wie auf StartSite -->
+    <!-- Navigation mit Account Dropdown -->
     <nav class="main-nav">
         <ul>
-            <li><a href="StartSite.html">Home</a></li>
-            <li><a href="login.html">Login</a></li>
-            <li><a href="createAccount.html">Account erstellen</a></li>
+            <li><a href="StartSite.html">🏠 Home</a></li>
+            
+            <!-- Account Dropdown -->
+            <li class="dropdown" id="accountDropdown">
+                <!-- Wenn NICHT eingeloggt: Account Button -->
+                <button class="dropdown-btn" id="accountBtn">
+                    👤 Account
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                
+                <!-- Wenn NICHT eingeloggt: Dropdown Content -->
+                <div class="dropdown-content" id="accountDropdownContent">
+                    <a href="login.html" class="dropdown-item">
+                        <span class="dropdown-item-icon">🔑</span>
+                        Anmelden
+                    </a>
+                    <a href="createAccount.html" class="dropdown-item">
+                        <span class="dropdown-item-icon">✨</span>
+                        Account erstellen
+                    </a>
+                </div>
+                
+                <!-- Wenn EINGELOGGT: User Info -->
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <span class="user-name" id="userName">Admin</span>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                
+                <!-- Wenn EINGELOGGT: Dropdown Content -->
+                <div class="dropdown-content" id="userDropdownContent" style="display: none;">
+                    <a href="#" class="dropdown-item" id="geschmacksprofil">
+                        <span class="dropdown-item-icon">🍽️</span>
+                        Geschmacksprofil
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <span class="dropdown-item-icon">⭐</span>
+                        Meine Favoriten
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <span class="dropdown-item-icon">⚙️</span>
+                        Einstellungen
+                    </a>
+                    <a href="#" class="dropdown-item logout-item" id="logoutBtn">
+                        <span class="dropdown-item-icon">🚪</span>
+                        Abmelden
+                    </a>
+                </div>
+            </li>
         </ul>
     </nav>
 
@@ -36,74 +84,78 @@
     <main>
         <!-- Login Container -->
         <div class="login-container">
-        <!-- Session Status anzeigen -->
-        <div class="session-status" id="sessionStatus">
-            <div class="status-title">Session Status</div>
-            <div class="status-content" id="sessionContent">Prüfe Session...</div>
-        </div>
+            <!-- Session Status anzeigen -->
+            <div class="session-status" id="sessionStatus">
+                <div class="status-title">Session Status</div>
+                <div class="status-content" id="sessionContent">Prüfe Session...</div>
+            </div>
 
-        <!-- Status Messages -->
-        <div id="statusMessage" style="display: none;"></div>
+            <!-- Status Messages -->
+            <div id="statusMessage" style="display: none;"></div>
 
-        <!-- Login Form -->
-        <div id="loginForm">
-            <h1 class="login-title">Anmelden</h1>
-            
-            <form id="login-form">
-                <div class="form-group">
-                    <label class="form-label" for="username">Benutzername</label>
-                    <input 
-                        type="text" 
-                        id="username" 
-                        name="username" 
-                        class="form-input" 
-                        placeholder="admin"
-                        required 
-                    />
-                </div>
+            <!-- Login Form -->
+            <div id="loginForm">
+                <h1 class="login-title">Anmelden</h1>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label" for="username">Benutzername</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-input" 
+                            placeholder="admin"
+                            required 
+                        />
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="password">Passwort</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        class="form-input" 
-                        placeholder="pass"
-                        required 
-                    />
-                </div>
+                    <div class="form-group">
+                        <label class="form-label" for="password">Passwort</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="pass"
+                            required 
+                        />
+                    </div>
 
-                <!-- Loading Animation -->
-                <div class="loading" id="loading">
-                    <div class="loading-spinner"></div>
-                    <p>Anmeldung läuft...</p>
-                </div>
+                    <!-- Loading Animation -->
+                    <div class="loading" id="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Anmeldung läuft...</p>
+                    </div>
 
-                <button type="submit" class="btn btn-primary" id="loginBtn">
-                    🔑 Anmelden
+                    <button type="submit" class="btn btn-primary" id="loginBtn">
+                        🔑 Anmelden
+                    </button>
+                </form>
+            </div>
+
+            <!-- Logout Section (wird angezeigt wenn angemeldet) -->
+            <div id="logoutSection" style="display: none;">
+                <h1 class="login-title">Willkommen zurück!</h1>
+                <p style="text-align: center; margin-bottom: 1.5rem; font-family: sans-serif;">
+                    Du bist bereits angemeldet.
+                </p>
+                
+                <button class="btn btn-secondary" onclick="logout()">
+                    🚪 Abmelden
                 </button>
-            </form>
-        </div>
+                
+                <a href="/" class="btn btn-primary" style="text-decoration: none; display: block; text-align: center;">
+                    🏠 Zur Startseite
+                </a>
+            </div>
 
-        <!-- Logout Section (wird angezeigt wenn angemeldet) -->
-        <div id="logoutSection" style="display: none;">
-            <h1 class="login-title">Willkommen zurück!</h1>
-            <p style="text-align: center; margin-bottom: 1.5rem; font-family: sans-serif;">
-                Du bist bereits angemeldet.
-            </p>
-            
-            <button class="btn btn-secondary" onclick="logout()">
-                🚪 Abmelden
-            </button>
-            
-            <a href="/" class="btn btn-primary" style="text-decoration: none; display: block; text-align: center;">
-                🏠 Zur Startseite
-            </a>
+            <!-- Links -->
+            <div class="link-group">
+                <a href="createAccount.html" class="link">Account erstellen</a>
+                <a href="/" class="link">Zur Startseite</a>
+            </div>
         </div>
-
-        <!-- Links -->
-        
     </main>
 
     <!-- Footer wie auf StartSite -->
