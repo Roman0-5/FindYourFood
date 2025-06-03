@@ -1,8 +1,8 @@
-// === GESCHMACKSPROFIL FUNCTIONALITY ===
+// === GESCHMACKSPROFIL FUNCTIONALITY - REST API VERSION ===
 
 // Globale Variablen
 let currentUser = null;
-let userPreferences = ["italian", "japanese"]; // Beispiel-Daten (später aus Session/DB)
+let userPreferences = []; // Wird von API geladen
 
 // Kategorie-Mapping für bessere Anzeige
 const categoryMapping = {
@@ -41,18 +41,16 @@ async function initializeGeschmacksprofil() {
   const sessionData = await checkSession();
 
   if (sessionData.loggedIn) {
-    // User ist eingeloggt
     showGeschmacksprofilContent(sessionData.user);
-    loadUserPreferences(sessionData.user);
+    await loadUserPreferences();
   } else {
-    // User ist nicht eingeloggt
     showLoginRequired();
   }
 
-  // Event Listeners initialisieren
   setupEventListeners();
 }
 
+// GET /session-check
 async function checkSession() {
   try {
     const response = await fetch("/session-check");
@@ -76,7 +74,6 @@ function showGeschmacksprofilContent(user) {
   document.getElementById("loginRequired").style.display = "none";
   document.getElementById("geschmacksprofilContent").style.display = "block";
 
-  // Update user name
   const userNameDisplay = document.getElementById("userNameDisplay");
   if (userNameDisplay && user) {
     userNameDisplay.textContent = user.name;
@@ -86,13 +83,11 @@ function showGeschmacksprofilContent(user) {
 // === EVENT LISTENERS ===
 
 function setupEventListeners() {
-  // Add Category Button
   const addCategoryBtn = document.getElementById("addCategoryBtn");
   if (addCategoryBtn) {
     addCategoryBtn.addEventListener("click", addCategory);
   }
 
-  // Category Select (Enter key)
   const categorySelect = document.getElementById("categorySelect");
   if (categorySelect) {
     categorySelect.addEventListener("keydown", function (event) {
@@ -102,7 +97,6 @@ function setupEventListeners() {
     });
   }
 
-  // Profile Action Buttons
   const saveProfileBtn = document.getElementById("saveProfileBtn");
   if (saveProfileBtn) {
     saveProfileBtn.addEventListener("click", saveProfile);
@@ -119,16 +113,242 @@ function setupEventListeners() {
   }
 }
 
-// === PREFERENCES MANAGEMENT ===
+// === REST API CALLS ===
 
-function loadUserPreferences(user) {
-  // Hier würdest du später die Präferenzen aus der Datenbank laden
-  // Für jetzt verwenden wir die Beispiel-Daten
-  console.log("Loading preferences for user:", user.name);
+// GET /api/preferences
+async function loadUserPreferences() {
+  try {
+    const response = await fetch("/api/preferences", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  updatePreferencesDisplay();
-  updateRecommendations();
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      userPreferences = data.preferences || [];
+      updatePreferencesDisplay();
+      updateRecommendations();
+    }
+  } catch (error) {
+    console.error("Load preferences error:", error);
+    showStatusMessage("error", "❌ Fehler beim Laden der Präferenzen");
+    userPreferences = [];
+  }
 }
+
+// POST /api/preferences
+async function addCategory() {
+  const categorySelect = document.getElementById("categorySelect");
+  const selectedCategory = categorySelect.value;
+
+  if (!selectedCategory) {
+    showStatusMessage("error", "❌ Bitte wähle eine Küche aus.");
+    return;
+  }
+
+  if (userPreferences.includes(selectedCategory)) {
+    showStatusMessage(
+      "warning",
+      "⚠️ Diese Küche ist bereits in deinen Favoriten."
+    );
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/preferences", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        cuisine_type: selectedCategory,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      userPreferences.push(selectedCategory);
+      updatePreferencesDisplay();
+      updateRecommendations();
+      categorySelect.value = "";
+
+      const categoryName =
+        categoryMapping[selectedCategory] || selectedCategory;
+      showStatusMessage("success", `✅ ${categoryName} hinzugefügt!`);
+    }
+  } catch (error) {
+    console.error("Add category error:", error);
+    showStatusMessage("error", "❌ Fehler beim Hinzufügen der Küche");
+  }
+}
+
+// DELETE /api/preferences/:cuisine
+async function removeCategory(category) {
+  if (
+    !confirm(`Möchtest du "${categoryMapping[category]}" wirklich entfernen?`)
+  ) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `/api/preferences/${encodeURIComponent(category)}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      userPreferences = userPreferences.filter((pref) => pref !== category);
+      updatePreferencesDisplay();
+      updateRecommendations();
+
+      const categoryName = categoryMapping[category] || category;
+      showStatusMessage("info", `ℹ️ ${categoryName} entfernt.`);
+    }
+  } catch (error) {
+    console.error("Remove category error:", error);
+    showStatusMessage("error", "❌ Fehler beim Entfernen der Küche");
+  }
+}
+
+// PUT /api/preferences
+async function saveProfile() {
+  if (!currentUser) {
+    showStatusMessage(
+      "error",
+      "❌ Du musst angemeldet sein um das Profil zu speichern."
+    );
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/preferences", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        preferences: userPreferences,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      showStatusMessage(
+        "success",
+        "💾 Geschmacksprofil erfolgreich gespeichert!"
+      );
+    }
+  } catch (error) {
+    console.error("Save profile error:", error);
+    showStatusMessage("error", "❌ Fehler beim Speichern des Profils.");
+  }
+}
+
+// DELETE /api/preferences
+async function resetProfile() {
+  if (
+    !confirm("Möchtest du wirklich alle deine Lieblings-Küchen zurücksetzen?")
+  ) {
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/preferences", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      userPreferences = [];
+      updatePreferencesDisplay();
+      updateRecommendations();
+      showStatusMessage("info", "🔄 Geschmacksprofil wurde zurückgesetzt.");
+    }
+  } catch (error) {
+    console.error("Reset profile error:", error);
+    showStatusMessage("error", "❌ Fehler beim Zurücksetzen des Profils.");
+  }
+}
+
+// GET /api/preferences/export
+async function exportProfile() {
+  if (userPreferences.length === 0) {
+    showStatusMessage(
+      "warning",
+      "⚠️ Dein Profil ist leer. Füge erst Lieblings-Küchen hinzu."
+    );
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/preferences/export", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `geschmacksprofil_${currentUser?.name || "user"}_${
+      new Date().toISOString().split("T")[0]
+    }.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showStatusMessage("success", "📤 Geschmacksprofil erfolgreich exportiert!");
+  } catch (error) {
+    console.error("Export profile error:", error);
+    showStatusMessage("error", "❌ Fehler beim Exportieren des Profils.");
+  }
+}
+
+// === UI FUNCTIONS ===
 
 function updatePreferencesDisplay() {
   const container = document.getElementById("currentPreferences");
@@ -158,65 +378,6 @@ function updatePreferencesDisplay() {
   }
 }
 
-function addCategory() {
-  const categorySelect = document.getElementById("categorySelect");
-  const selectedCategory = categorySelect.value;
-
-  if (!selectedCategory) {
-    showStatusMessage("error", "❌ Bitte wähle eine Küche aus.");
-    return;
-  }
-
-  if (userPreferences.includes(selectedCategory)) {
-    showStatusMessage(
-      "warning",
-      "⚠️ Diese Küche ist bereits in deinen Favoriten."
-    );
-    return;
-  }
-
-  // Kategorie hinzufügen
-  userPreferences.push(selectedCategory);
-
-  // UI aktualisieren
-  updatePreferencesDisplay();
-  updateRecommendations();
-
-  // Select zurücksetzen
-  categorySelect.value = "";
-
-  // Feedback
-  const categoryName = categoryMapping[selectedCategory] || selectedCategory;
-  showStatusMessage(
-    "success",
-    `✅ ${categoryName} zu deinen Favoriten hinzugefügt!`
-  );
-}
-
-function removeCategory(category) {
-  if (
-    !confirm(
-      `Möchtest du "${categoryMapping[category]}" wirklich aus deinen Favoriten entfernen?`
-    )
-  ) {
-    return;
-  }
-
-  // Kategorie entfernen
-  userPreferences = userPreferences.filter((pref) => pref !== category);
-
-  // UI aktualisieren
-  updatePreferencesDisplay();
-  updateRecommendations();
-
-  // Feedback
-  const categoryName = categoryMapping[category] || category;
-  showStatusMessage(
-    "info",
-    `ℹ️ ${categoryName} aus deinen Favoriten entfernt.`
-  );
-}
-
 // === RECOMMENDATIONS ===
 
 function updateRecommendations() {
@@ -234,7 +395,6 @@ function updateRecommendations() {
   recommendationCards.style.display = "grid";
   noRecommendations.style.display = "none";
 
-  // Generiere Empfehlungen basierend auf Präferenzen
   const recommendations = generateRecommendations();
 
   recommendationCards.innerHTML = recommendations
@@ -252,7 +412,6 @@ function updateRecommendations() {
 function generateRecommendations() {
   const recommendations = [];
 
-  // Empfehlungen basierend auf Präferenzen
   if (userPreferences.includes("japanese")) {
     recommendations.push({
       title: "🍣 Sushi-Restaurants in Wien",
@@ -285,7 +444,6 @@ function generateRecommendations() {
     });
   }
 
-  // Allgemeine Empfehlungen wenn viele Präferenzen
   if (userPreferences.length >= 3) {
     recommendations.push({
       title: "🌍 Fusion-Küche",
@@ -294,7 +452,6 @@ function generateRecommendations() {
     });
   }
 
-  // Neue Küchen vorschlagen
   const notSelected = Object.keys(categoryMapping).filter(
     (cat) => !userPreferences.includes(cat)
   );
@@ -307,91 +464,7 @@ function generateRecommendations() {
     });
   }
 
-  return recommendations.slice(0, 4); // Maximal 4 Empfehlungen
-}
-
-// === PROFILE ACTIONS ===
-
-async function saveProfile() {
-  if (!currentUser) {
-    showStatusMessage(
-      "error",
-      "❌ Du musst angemeldet sein um das Profil zu speichern."
-    );
-    return;
-  }
-
-  try {
-    // Hier würdest du später an deine API senden
-    // const response = await fetch('/api/profile/preferences', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ preferences: userPreferences })
-    // });
-
-    // Simulation für jetzt
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    showStatusMessage(
-      "success",
-      "💾 Geschmacksprofil erfolgreich gespeichert!"
-    );
-    console.log("Saved preferences:", userPreferences);
-  } catch (error) {
-    console.error("Save profile error:", error);
-    showStatusMessage("error", "❌ Fehler beim Speichern des Profils.");
-  }
-}
-
-function resetProfile() {
-  if (
-    !confirm("Möchtest du wirklich alle deine Lieblings-Küchen zurücksetzen?")
-  ) {
-    return;
-  }
-
-  userPreferences = [];
-  updatePreferencesDisplay();
-  updateRecommendations();
-
-  showStatusMessage("info", "🔄 Geschmacksprofil wurde zurückgesetzt.");
-}
-
-function exportProfile() {
-  if (userPreferences.length === 0) {
-    showStatusMessage(
-      "warning",
-      "⚠️ Dein Profil ist leer. Füge erst Lieblings-Küchen hinzu."
-    );
-    return;
-  }
-
-  const profileData = {
-    user: currentUser ? currentUser.name : "Unbekannt",
-    preferences: userPreferences.map((pref) => ({
-      id: pref,
-      name: categoryMapping[pref] || pref,
-    })),
-    exportDate: new Date().toISOString(),
-    totalPreferences: userPreferences.length,
-  };
-
-  // JSON-Datei erstellen und downloaden
-  const dataStr = JSON.stringify(profileData, null, 2);
-  const dataBlob = new Blob([dataStr], { type: "application/json" });
-  const url = URL.createObjectURL(dataBlob);
-
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `geschmacksprofil_${currentUser?.name || "user"}_${
-    new Date().toISOString().split("T")[0]
-  }.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-
-  showStatusMessage("success", "📤 Geschmacksprofil erfolgreich exportiert!");
+  return recommendations.slice(0, 4);
 }
 
 // === UTILITY FUNCTIONS ===
@@ -404,28 +477,23 @@ function showStatusMessage(type, message) {
   statusMessage.className = `status-message status-${type}`;
   statusMessage.innerHTML = message;
 
-  // Scroll to message
   statusMessage.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
-  // Auto-hide after 5 seconds
   setTimeout(() => {
     statusMessage.style.display = "none";
   }, 5000);
 }
 
-// === INTEGRATION MIT SEARCH ===
+// === PUBLIC API ===
 
-// Diese Funktion kann später verwendet werden um Suche zu personalisieren
 function getPreferencesForSearch() {
   return userPreferences;
 }
 
-// Diese Funktion kann von anderen Seiten aufgerufen werden
 window.getUserPreferences = function () {
   return userPreferences;
 };
 
-// Event für andere Teile der App
 function notifyPreferencesChanged() {
   const event = new CustomEvent("preferencesChanged", {
     detail: { preferences: userPreferences },
@@ -433,33 +501,10 @@ function notifyPreferencesChanged() {
   window.dispatchEvent(event);
 }
 
-// === ERWEITERTE FUNKTIONEN (für später) ===
-
-// Präferenzen basierend auf Suchhistorie vorschlagen
-function suggestPreferencesFromHistory() {
-  // Placeholder für zukünftige Implementierung
-  console.log("Analyzing search history for suggestions...");
-}
-
-// Restaurant-Bewertungen in Empfehlungen einbeziehen
-function getPersonalizedRestaurantRecommendations() {
-  // Placeholder für zukünftige API-Integration
-  console.log("Getting personalized restaurant recommendations...");
-}
-
 // === DEBUG FUNCTIONS ===
 
-// Debug: Aktuelle Präferenzen anzeigen
-function debugPreferences() {
-  console.log("=== GESCHMACKSPROFIL DEBUG ===");
-  console.log("Current User:", currentUser);
-  console.log("User Preferences:", userPreferences);
-  console.log("Available Categories:", Object.keys(categoryMapping));
-}
-
-// Debug-Funktionen für Development
 window.debugGeschmacksprofil = {
-  showPreferences: debugPreferences,
+  showPreferences: () => console.log("Preferences:", userPreferences),
   addTestPreferences: () => {
     userPreferences = ["italian", "japanese", "indian", "mexican"];
     updatePreferencesDisplay();
