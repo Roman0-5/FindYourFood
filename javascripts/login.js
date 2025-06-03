@@ -1,0 +1,191 @@
+// === SESSION MANAGEMENT FUNCTIONS ===
+
+// Beim Laden der Seite Session prüfen
+document.addEventListener("DOMContentLoaded", function () {
+  checkSession();
+  initializeForm();
+});
+
+// Session Status prüfen
+async function checkSession() {
+  try {
+    const response = await fetch("/session-check");
+    const data = await response.json();
+
+    const sessionContent = document.getElementById("sessionContent");
+    const loginForm = document.getElementById("loginForm");
+    const logoutSection = document.getElementById("logoutSection");
+
+    if (data.loggedIn) {
+      // User ist angemeldet
+      sessionContent.innerHTML = `
+                ✅ <strong>Angemeldet als:</strong> ${data.user.name}<br>
+                <small>Session aktiv</small>
+            `;
+      loginForm.style.display = "none";
+      logoutSection.style.display = "block";
+    } else {
+      // User ist nicht angemeldet
+      sessionContent.innerHTML = `
+                <strong>Ich kenn dich nicht</strong><br>
+                <small>Bitte melden sie sich an</small>
+            `;
+      loginForm.style.display = "block";
+      logoutSection.style.display = "none";
+    }
+  } catch (error) {
+    console.error("Session check error:", error);
+    document.getElementById("sessionContent").innerHTML = `
+            ⚠️ <strong>Fehler beim Session-Check</strong><br>
+            <small>Verbindung zum Server prüfen</small>
+        `;
+  }
+}
+
+// Form initialisieren
+function initializeForm() {
+  // Demo-Daten vorausfüllen (nur für Testing)
+  document.getElementById("username").value = "admin";
+  document.getElementById("password").value = "pass";
+
+  // Login Form Event Listener
+  document.getElementById("login-form").addEventListener("submit", handleLogin);
+}
+
+// === LOGIN FUNCTIONS ===
+
+// Login Form Handler
+async function handleLogin(event) {
+  event.preventDefault();
+
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const loading = document.getElementById("loading");
+  const loginBtn = document.getElementById("loginBtn");
+  const statusMessage = document.getElementById("statusMessage");
+
+  // Validierung
+  if (!username || !password) {
+    showStatusMessage("error", "❌ Bitte alle Felder ausfüllen.");
+    return;
+  }
+
+  // Loading anzeigen
+  showLoading(true);
+  loginBtn.disabled = true;
+  hideStatusMessage();
+
+  try {
+    const response = await fetch("/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const result = await response.json();
+
+    // Loading verstecken
+    showLoading(false);
+    loginBtn.disabled = false;
+
+    if (response.ok) {
+      // Erfolgreiche Anmeldung
+      showStatusMessage("success", `✅ ${result.message}`);
+
+      // Nach kurzer Verzögerung zur Startseite weiterleiten
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1500);
+    } else {
+      // Fehlgeschlagene Anmeldung
+      showStatusMessage("error", `❌ ${result.message}`);
+    }
+  } catch (error) {
+    // Netzwerkfehler
+    showLoading(false);
+    loginBtn.disabled = false;
+    showStatusMessage(
+      "error",
+      "❌ Verbindungsfehler. Bitte versuche es später erneut."
+    );
+    console.error("Login error:", error);
+  }
+}
+
+// === LOGOUT FUNCTIONS ===
+
+// Logout Function
+async function logout() {
+  const statusMessage = document.getElementById("statusMessage");
+
+  try {
+    const response = await fetch("/logout", { method: "POST" });
+    const result = await response.json();
+
+    showStatusMessage("success", `✅ ${result.message}`);
+
+    // Session Status aktualisieren
+    setTimeout(() => {
+      checkSession();
+      hideStatusMessage();
+    }, 1500);
+  } catch (error) {
+    showStatusMessage("error", "❌ Fehler beim Abmelden.");
+    console.error("Logout error:", error);
+  }
+}
+
+// === UTILITY FUNCTIONS ===
+
+// Loading Animation anzeigen/verstecken
+function showLoading(show) {
+  const loading = document.getElementById("loading");
+  loading.style.display = show ? "block" : "none";
+}
+
+// Status Message anzeigen
+function showStatusMessage(type, message) {
+  const statusMessage = document.getElementById("statusMessage");
+  statusMessage.style.display = "block";
+  statusMessage.className = `status-message status-${type}`;
+  statusMessage.innerHTML = message;
+}
+
+// Status Message verstecken
+function hideStatusMessage() {
+  const statusMessage = document.getElementById("statusMessage");
+  statusMessage.style.display = "none";
+}
+
+// === ERROR HANDLING ===
+
+// Global Error Handler
+window.addEventListener("error", function (error) {
+  console.error("JavaScript Error:", error);
+  showStatusMessage("error", "❌ Ein unerwarteter Fehler ist aufgetreten.");
+});
+
+// Network Error Handler
+window.addEventListener("unhandledrejection", function (event) {
+  console.error("Unhandled Promise Rejection:", event.reason);
+  showStatusMessage(
+    "error",
+    "❌ Netzwerkfehler. Bitte Internetverbindung prüfen."
+  );
+});
+
+// === DEBUG FUNCTIONS (nur für Development) ===
+
+// Session Info in Console ausgeben (für Debugging)
+function debugSession() {
+  fetch("/session-check")
+    .then((res) => res.json())
+    .then((data) => console.log("Current Session:", data))
+    .catch((err) => console.error("Debug Session Error:", err));
+}
+
+// Alle lokalen Storage Items anzeigen (falls später verwendet)
+function debugStorage() {
+  console.log("LocalStorage:", localStorage);
+  console.log("SessionStorage:", sessionStorage);
+}

@@ -6,6 +6,7 @@ export const swaggerDocument = {
         description: "API zur Restaurantsuche über TomTom"
     },
     paths: {
+        
         "/search": {
             get: {
                 summary: "Sucht nach Restaurants und POIs",
