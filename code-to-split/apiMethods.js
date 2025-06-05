@@ -1,7 +1,7 @@
 /*Datei um Methoden bezüglich der API zu schreiben, da vieles von Button abhängig ist
 sind es nur mockups*/
-const API_KEY = "";
-const API_URL = "https://api.tomtom.com/search/2/";
+const API_KEY = process.env.API_KEY;
+const API_URL = process.env.API_URL;
 
 async function searchLocation(params) {
   const defaultParams = {

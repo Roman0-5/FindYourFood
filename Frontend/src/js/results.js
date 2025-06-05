@@ -1,6 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("results-container");
-
+  
+  // Überprüfe ob Container existiert
+  if (!container) {
+    console.error("❌ Element mit ID 'results-container' nicht gefunden!");
+    return;
+  }
 
   // 1. URL-Parameter auslesen
   const params = new URLSearchParams(window.location.search);
@@ -10,24 +15,31 @@ document.addEventListener("DOMContentLoaded", () => {
   const limit = params.get("limit") || "5";
   const openingHours = params.get("openingHours") || "any";
 
-  // 2. Anfrage-URL zur TomTom API aufbauen
-  const API = process.env.API_KEY;
-  const baseUrl = process.env.API_URL;
+  // 2. ❌ ENTFERNE DIESE ZEILEN:
+  // const apiKey = process.env.API_KEY
+  // const endpoint = process.env.API_URL || "https://api.tomtom.com/search/2";
 
-  const categories = category ? `&categorySet=${category}` : "";
-  const opening = openingHours === "nextSevenDays" ? "&openingHours=nextSevenDays" : "";
-
+  // 3. Anfrage-URL zu deinem eigenen Server
   const url = `/search?query=${query}&city=${city}&limit=${limit}&category=${category}&openingHours=${openingHours}`;
 
+  console.log("🔍 Lade Daten von:", url); // Debug
 
-  // 3. Fetch auf die API
+  // 4. Fetch auf deine eigene API
   fetch(url)
-    .then(res => res.json())
+    .then(res => {
+      console.log("📡 Response Status:", res.status); // Debug
+      return res.json();
+    })
     .then(data => {
+      console.log("📊 Erhaltene Daten:", data); // Debug
+      
       if (!data.results || data.results.length === 0) {
         container.innerHTML = "<p>No results found. Try different search terms.</p>";
         return;
       }
+
+      // Container leeren
+      container.innerHTML = "";
 
       data.results.forEach(result => {
         const { poi, address } = result;
@@ -43,10 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
         container.appendChild(element);
       });
     })
-
     .catch(err => {
-      console.error("API Error:", err);
+      console.error("❌ API Error:", err);
       container.innerHTML = "<p>Something went wrong while loading results.</p>";
     });
 });
-

@@ -49,17 +49,16 @@ app.get('/session-check', (req, res) => {
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // === Statische Dateien ===
-app.use(express.static(path.join(__dirname, 'htmls')));
-app.use('/stylesheets', express.static(path.join(__dirname, 'stylesheets')));
-app.use('/javascripts', express.static(path.join(__dirname, 'javascripts')));
-
+app.use(express.static(path.join(__dirname, '../../Frontend/src/pages'))); // Zwei Ebenen hoch
+app.use('/js', express.static(path.join(__dirname, '../../Frontend/src/js')));
+app.use('/css', express.static(path.join(__dirname, '../../Frontend/src/css')));
 // === HTML-Seiten Routing ===
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'htmls', 'StartSite.html'));
+  res.sendFile(path.join(__dirname, '../../Frontend/src/pages', 'StartSite.html')); // Zwei Ebenen hoch
 });
 
 app.get('/Results.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'htmls', 'Results.html'));
+  res.sendFile(path.join(__dirname, '../../Frontend/src/pages', 'Results.html')); // Zwei Ebenen hoch
 });
 
 // === API Endpoint ===

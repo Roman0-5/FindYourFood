@@ -1,0 +1,33 @@
+{
+  "name": "findyourfood",
+  "version": "1.0.0",
+  "description": "Für den Anfang nur PseudoCode hinzugefügt damit \"Gerüst\" existiert",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node Backend/src/server.js",
+    "dev": "nodemon Backend/src/server.js",
+    "start-nodemon": "nodemon Backend/src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Roman0-5/FindYourFood.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Roman0-5/FindYourFood/issues"
+  },
+  "homepage": "https://github.com/Roman0-5/FindYourFood#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "node-fetch": "^3.3.2",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
