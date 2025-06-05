@@ -1,4 +1,8 @@
 // === Fertige server.js ===
+import dotenv from 'dotenv';
+dotenv.config();
+console.log('🔑 API_KEY geladen:', process.env.API_KEY); // DEBUG
+
 import express from 'express';
 import fetch from 'node-fetch';
 import path from 'path';
@@ -14,7 +18,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 3000;
 
-// === Session Management ===
+// === Session Management ===import dotenv from 'dotenv';
+dotenv.config();
 app.use(session({
   secret: 'mySecretKey',
   resave: false,
@@ -62,22 +67,38 @@ app.get('/Results.html', (req, res) => {
 });
 
 // === API Endpoint ===
+// server.js - KORRIGIERT
 app.get('/search', async (req, res) => {
+  console.log('🔍 Search Request received:', req.query);
+  
   const { query, city, category, limit = 5, openingHours = "any" } = req.query;
 
-  const apiKey = 'XBGR9rfvBUGOxGERVE0cBc3flVg9auOW';
+  const apiKey = process.env.API_KEY;
+  console.log('🔑 API Key from env:', apiKey ? 'LOADED' : 'MISSING');
+  
+  if (!apiKey) {
+    console.log('❌ API Key fehlt!');
+    return res.status(500).json({ error: "API Key nicht konfiguriert" });
+  }
+
   const q = `${query} ${city}`;
   const categories = category ? `&categorySet=${category}` : '';
   const opening = openingHours === 'nextSevenDays' ? '&openingHours=nextSevenDays' : '';
 
   const url = `https://api.tomtom.com/search/2/search/${encodeURIComponent(q)}.json?key=${apiKey}&limit=${limit}&countrySet=AT&idxSet=POI&minFuzzyLevel=1&maxFuzzyLevel=2${categories}${opening}`;
+  
+  console.log('🌐 Final URL:', url);
 
   try {
     const response = await fetch(url);
+    console.log('📡 Response Status:', response.status);
+    
     const data = await response.json();
+    console.log('📊 Response Data:', data);
+    
     res.json(data);
   } catch (error) {
-    console.error("TomTom API error:", error);
+    console.error("❌ TomTom API error:", error);
     res.status(500).json({ error: "Something went wrong" });
   }
 });
