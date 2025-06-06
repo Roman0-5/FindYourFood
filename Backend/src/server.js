@@ -1,31 +1,88 @@
 // === Fertige server.js ===
-import dotenv from 'dotenv';
-dotenv.config();
-console.log('🔑 API_KEY geladen:', process.env.API_KEY); // DEBUG
-
-import express from 'express';
-import fetch from 'node-fetch';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import session from 'express-session';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import dotenv from 'dotenv';
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+console.log(' ACCESS_TOKEN_SECRET:', process.env.ACCESS_TOKEN_SECRET ? 'Gefunden ' : 'Fehlt ');
+console.log(' API_KEY geladen:', process.env.API_KEY); // DEBUG
+
+// JWT
+import jwt from 'jsonwebtoken';
+import express from 'express';
+import fetch from 'node-fetch';
+//import session from 'express-session'; - löschen wenn JWT implementiert
 import swaggerUi from 'swagger-ui-express';
 import { swaggerDocument } from './swagger.js';
 
 // Für __dirname in ES-Modulen
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+
 
 const app = express();
 const PORT = 3000;
+app.use(express.json());
+
+
+// === Debug Logs ===
+console.log(' ACCESS_TOKEN_SECRET:', process.env.ACCESS_TOKEN_SECRET ? 'OK' : 'FEHLT!');
+console.log(' API_KEY geladen:', process.env.API_KEY || 'FEHLT!');
+
+
+// === JWT Middleware ===
+function authenticateJWT (req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader?.split(' ')[1];
+
+  if (!token) return res.sendStatus(401); //falls kein Token geschickt wird
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403); //Token ungültig oder abgelaufen
+    req.user = user; //Benutzerinfo in Request speichern
+    next(); //Zugriff gewähren
+  });
+}
+
+// === Login-Route (Mocked Admin Login) ===
+app.post('/login', express.json(), (req, res) => {
+  const { username, password } = req.body;
+
+  //TODO: echte DB-Abfrage statt Hardcode!
+  if (username === 'admin' && password === 'pass') {
+    const user = { name: username };
+
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || '3600' 
+    });
+    
+    res.json({message: 'Login erfolgreich', token: accessToken });
+  
+  } else {
+    res.status(401).json({ message: 'Login fehlgeschlagen' });
+  }
+});
+
+//Login Status prüfen
+app.get('/me', authenticateJWT, (req, res) => {
+  res.json({ loggedIn: true, user: req.user });
+});
+
+
+
+
+/*
 
 // === Session Management ===import dotenv from 'dotenv';
-dotenv.config();
 app.use(session({
   secret: 'mySecretKey',
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false } // In dev okay
 }));
+
 
 app.post('/login', express.json(), (req, res) => {
   const { username, password } = req.body;
@@ -50,6 +107,8 @@ app.get('/session-check', (req, res) => {
   }
 });
 
+*/
+
 // === Swagger UI ===
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -57,6 +116,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.static(path.join(__dirname, '../../Frontend/src/pages'))); // Zwei Ebenen hoch
 app.use('/js', express.static(path.join(__dirname, '../../Frontend/src/js')));
 app.use('/css', express.static(path.join(__dirname, '../../Frontend/src/css')));
+
 // === HTML-Seiten Routing ===
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../../Frontend/src/pages', 'StartSite.html')); // Zwei Ebenen hoch

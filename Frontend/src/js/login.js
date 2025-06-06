@@ -2,46 +2,68 @@
 
 // Beim Laden der Seite Session prüfen
 document.addEventListener("DOMContentLoaded", function () {
-  checkSession();
-  initializeForm();
+  checkSession(); //Prüfung auf gültiges JWT im localstorage
+  initializeForm(); //Demodaten
 });
 
 // Session Status prüfen
 async function checkSession() {
-  try {
-    const response = await fetch("/session-check");
-    const data = await response.json();
+  const token = localStorage.getItem("jwtToken"); //Ist Token da? Falls nicht ist User ausgeloggt
 
-    const sessionContent = document.getElementById("sessionContent");
-    const loginForm = document.getElementById("loginForm");
-    const logoutSection = document.getElementById("logoutSection");
+  if(!token) {
+    updateUIForLoggedOutUser();
+    return;
+  }
 
-    if (data.loggedIn) {
-      // User ist angemeldet
-      sessionContent.innerHTML = `
-                ✅ <strong>Angemeldet als:</strong> ${data.user.name}<br>
-                <small>Session aktiv</small>
-            `;
-      loginForm.style.display = "none";
-      logoutSection.style.display = "block";
-    } else {
-      // User ist nicht angemeldet
-      sessionContent.innerHTML = `
-                <strong>Ich kenn dich nicht</strong><br>
-                <small>Bitte melden sie sich an</small>
-            `;
-      loginForm.style.display = "block";
-      logoutSection.style.display = "none";
+  try {  //Nutzerabfrage
+    const response = await fetch("/me", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    })
+
+    if (!response.ok) {
+      updateUIForLoggedOutUser();
+      return;
     }
+
+    const data = await response.json();
+    updateUIForLoggedInUser(data.user);
   } catch (error) {
-    console.error("Session check error:", error);
-    document.getElementById("sessionContent").innerHTML = `
-            ⚠️ <strong>Fehler beim Session-Check</strong><br>
-            <small>Verbindung zum Server prüfen</small>
-        `;
+    console.error("JWT check error:", error);
+    updateUIForLoggedOutUser();
   }
 }
 
+//UI abhängig von Login Status (eingeloggt)
+function updateUIForLoggedInUser(user) {
+  const sessionContent = document.getElementById("sessionContent");
+  const loginForm = document.getElementById("loginForm");
+  const logoutSection = document.getElementById("logoutSection");
+
+  sessionContent.innerHTML = `
+    <strong>Angemeldet als:</strong> ${user.name}<br>
+    <small>JWT aktiv</small>
+  `;
+  loginForm.style.display = "none";
+  logoutSection.style.display = "block";
+}
+
+
+//UI abhängig von Login Status (ausgeloggt)
+function updateUIForLoggedOutUser() {
+  const sessionContent = document.getElementById("sessionContent");
+  const loginForm = document.getElementById("loginForm");
+  const logoutSection = document.getElementById("logoutSection");
+
+  sessionContent.innerHTML = `
+    <strong>Ich kenn dich nicht</strong><br>
+    <small>Bitte melden sie sich an</small>
+  `;
+  loginForm.style.display = "block";
+  logoutSection.style.display = "none";
+}
 // Form initialisieren
 function initializeForm() {
   // Demo-Daten vorausfüllen (nur für Testing)
@@ -75,6 +97,7 @@ async function handleLogin(event) {
   loginBtn.disabled = true;
   hideStatusMessage();
 
+  //Sendet Login-Daten an Server - bei Erfolt JWT speichern
   try {
     const response = await fetch("/login", {
       method: "POST",
@@ -89,8 +112,11 @@ async function handleLogin(event) {
     loginBtn.disabled = false;
 
     if (response.ok) {
-      // Erfolgreiche Anmeldung
+      // Erfolgreiche Anmeldung - speichert JWT im localStorage – wird für spätere Anfragen verwendet
+
+      localStorage.setItem("jwtToken", result.token);
       showStatusMessage("success", `✅ ${result.message}`);
+
 
       // Nach kurzer Verzögerung zur Startseite weiterleiten
       setTimeout(() => {
@@ -114,25 +140,15 @@ async function handleLogin(event) {
 
 // === LOGOUT FUNCTIONS ===
 
-// Logout Function
-async function logout() {
-  const statusMessage = document.getElementById("statusMessage");
+// Logout Function - Entfernt JWT → Nutzer gilt als ausgeloggt
+function logout() {
+  localStorage.removeItem("jwtToken");
+  showStatusMessage("success", "Erfolgreich abgemeldet");
 
-  try {
-    const response = await fetch("/logout", { method: "POST" });
-    const result = await response.json();
-
-    showStatusMessage("success", `✅ ${result.message}`);
-
-    // Session Status aktualisieren
-    setTimeout(() => {
-      checkSession();
-      hideStatusMessage();
-    }, 1500);
-  } catch (error) {
-    showStatusMessage("error", "❌ Fehler beim Abmelden.");
-    console.error("Logout error:", error);
-  }
+  setTimeout(() => {
+    checkSession();
+    hideStatusMessage();
+  }, 1000);
 }
 
 // === UTILITY FUNCTIONS ===
