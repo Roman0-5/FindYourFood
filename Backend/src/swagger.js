@@ -1,64 +1,119 @@
 export const swaggerDocument = {
-    openapi: "3.0.0",
+    openapi: '3.0.1',
     info: {
-        title: "FindYourFood API",
-        version: "1.0.0",
-        description: "API zur Restaurantsuche über TomTom"
+        title: 'FindYourFood API',
+        version: '1.0.0',
+        description: 'API-Dokumentation für das FindYourFood System'
     },
+    servers: [
+        {
+            url: 'http://localhost:3000',
+            description: 'Lokaler Entwicklungsserver'
+        }
+    ],
+    components: {
+        securitySchemes: {
+            bearerAuth: {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT'
+            }
+        }
+    },
+    security: [
+        {
+            bearerAuth: []
+        }
+    ],
     paths: {
-        
-        "/search": {
-            get: {
-                summary: "Sucht nach Restaurants und POIs",
-                parameters: [
-                    {
-                        name: "query",
-                        in: "query",
-                        required: true,
-                        schema: { type: "string" },
-                        description: "Suchbegriff (z. B. 'Pizza')"
-                    },
-                    {
-                        name: "city",
-                        in: "query",
-                        required: false,
-                        schema: { type: "string" },
-                        description: "Stadt (z. B. Wien)"
-                    },
-                    {
-                        name: "category",
-                        in: "query",
-                        required: false,
-                        schema: { type: "string" },
-                        description: "Kategorie-ID laut TomTom (z. B. 7315025)"
-                    },
-                    {
-                        name: "limit",
-                        in: "query",
-                        required: false,
-                        schema: { type: "integer", default: 5 },
-                        description: "Anzahl der Ergebnisse"
-                    },
-                    {
-                        name: "openingHours",
-                        in: "query",
-                        required: false,
-                        schema: { type: "string", enum: ["any", "nextSevenDays"] },
-                        description: "Filter für Öffnungszeiten"
+        '/register': {
+            post: {
+                tags: ['Auth'],
+                summary: 'Neuen Benutzer registrieren',
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['username', 'email', 'password'],
+                                properties: {
+                                    username: { type: 'string', example: 'maxmustermann' },
+                                    email:    { type: 'string', format: 'email', example: 'max@mustermann.de' },
+                                    password: { type: 'string', format: 'password', example: 'sicheresPasswort123' }
+                                }
+                            }
+                        }
                     }
-                ],
+                },
                 responses: {
-                    200: {
-                        description: "Erfolgreiche Antwort mit POIs",
+                    '201': { description: 'Benutzer erfolgreich erstellt' },
+                    '400': { description: 'Fehlende oder ungültige Felder' },
+                    '409': { description: 'Benutzername oder E-Mail bereits vergeben' },
+                    '500': { description: 'Interner Serverfehler' }
+                }
+            }
+        },
+
+        '/login': {
+            post: {
+                tags: ['Auth'],
+                summary: 'Benutzer einloggen',
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['username', 'password'],
+                                properties: {
+                                    username: { type: 'string', example: 'maxmustermann' },
+                                    password: { type: 'string', format: 'password', example: 'sicheresPasswort123' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    '200': {
+                        description: 'Login erfolgreich',
                         content: {
-                            "application/json": {
+                            'application/json': {
                                 schema: {
-                                    type: "object",
+                                    type: 'object',
                                     properties: {
-                                        results: {
-                                            type: "array",
-                                            items: {
-                                                type: "object"
+                                        message: { type: 'string', example: 'Login erfolgreich' },
+                                        token:   { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '401': { description: 'Benutzer nicht gefunden oder falsches Passwort' },
+                    '500': { description: 'Interner Serverfehler' }
+                }
+            }
+        },
+
+        '/me': {
+            get: {
+                tags: ['Auth'],
+                summary: 'Login-Status prüfen',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    '200': {
+                        description: 'Login-Status OK',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        loggedIn: { type: 'boolean', example: true },
+                                        user: {
+                                            type: 'object',
+                                            properties: {
+                                                id:   { type: 'integer', example: 1 },
+                                                name: { type: 'string',  example: 'maxmustermann' }
                                             }
                                         }
                                     }
@@ -66,10 +121,75 @@ export const swaggerDocument = {
                             }
                         }
                     },
-                    400: { description: "Ungültige Anfrage" },
-                    500: { description: "Serverfehler" }
+                    '401': { description: 'Kein Token übermittelt' },
+                    '403': { description: 'Token ungültig oder abgelaufen' }
+                }
+            }
+        },
+
+        '/api/users/me': {
+            get: {
+                tags: ['User'],
+                summary: 'Profil des aktuell eingeloggten Nutzers',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'Authorization',
+                        in: 'header',
+                        description: 'Bearer JWT-Token, z.B. "Bearer eyJhbGciOi..."',
+                        required: true,
+                        schema: { type: 'string' }
+                    }
+                ],
+                responses: {
+                    '200': {
+                        description: 'Erfolgreiche Rückgabe des Nutzerprofils',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        user: {
+                                            type: 'object',
+                                            properties: {
+                                                id:       { type: 'integer', example: 1 },
+                                                username: { type: 'string',  example: 'maxmustermann' },
+                                                email:    { type: 'string',  example: 'max@mustermann.de' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '401': { description: 'Unauthorized – Kein oder ungültiger Token' },
+                    '403': { description: 'Forbidden – Token ungültig oder abgelaufen' },
+                    '404': { description: 'User nicht gefunden' },
+                    '500': { description: 'Interner Serverfehler' }
+                }
+            }
+        },
+
+        '/search': {
+            get: {
+                tags: ['Suche'],
+                summary: 'TomTom POI-Suche',
+                parameters: [
+                    { name: 'query', in: 'query', required: true, schema: { type: 'string' } },
+                    { name: 'city',  in: 'query', required: true, schema: { type: 'string' } },
+                    { name: 'category', in: 'query', schema: { type: 'string' } },
+                    { name: 'limit', in: 'query', schema: { type: 'integer', example: 5 } },
+                    { name: 'openingHours', in: 'query', schema: { type: 'string', example: 'any' } }
+                ],
+                responses: {
+                    '200': {
+                        description: 'Erfolgreiche Suche',
+                        content: { 'application/json': { schema: { type: 'object' } } }
+                    },
+                    '500': { description: 'TomTom API-Fehler' }
                 }
             }
         }
+
     }
 };

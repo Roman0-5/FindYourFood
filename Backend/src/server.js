@@ -79,6 +79,26 @@ app.get('/me', authenticateJWT, (req, res) => {
   res.json({ loggedIn: true, user: req.user });
 });
 
+// GET /api/users/me – Profil des eingeloggten Nutzers
+app.get('/api/users/me', authenticateJWT, async (req, res) => {
+  try {
+    const user = await findUserByUsername(req.user.name);
+    if (!user) {
+      return res.status(404).json({ message: 'User nicht gefunden' });
+    }
+    res.json({
+      user: {
+        id:       user.id,
+        username: user.username,
+        email:    user.email
+      }
+    });
+  } catch (err) {
+    console.error('❌ Fehler in GET /api/users/me:', err);
+    res.status(500).json({ message: 'Interner Serverfehler' });
+  }
+});
+
 
 //Route für Registrierung
 app.post('/register', async (req, res) => {
