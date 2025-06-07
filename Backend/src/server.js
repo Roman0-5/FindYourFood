@@ -1,6 +1,9 @@
 // === Fertige server.js ===
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { findUserByUsername, createUser, verifyPassword } from '../database/database.js';
+//import * as db from '../database/database.js';
+import bcrypt from 'bcryptjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,28 +49,67 @@ function authenticateJWT (req, res, next) {
   });
 }
 
-// === Login-Route (Mocked Admin Login) ===
-app.post('/login', express.json(), (req, res) => {
+
+//neue Login Route - kein Hardcode mehr
+app.post('/login', async (req, res) => {
   const { username, password } = req.body;
+  try {
+    const user = await findUserByUsername(username);
+    if (!user) {
+      return res.status(401).json({ message: 'Benutzer nicht gefunden' });
+    }
 
-  //TODO: echte DB-Abfrage statt Hardcode!
-  if (username === 'admin' && password === 'pass') {
-    const user = { name: username };
+    const valid = await verifyPassword(password, user.password_hash);
+    if (!valid) {
+      return res.status(401).json({ message: 'Falsches Passwort' });
+    }
 
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || '3600' 
+    const token = jwt.sign({ name: user.username, id: user.id }, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || '1h',
     });
-    
-    res.json({message: 'Login erfolgreich', token: accessToken });
-  
-  } else {
-    res.status(401).json({ message: 'Login fehlgeschlagen' });
+
+    res.json({ message: 'Login erfolgreich', token });
+  } catch (err) {
+    console.error('❌ Login-Fehler:', err);
+    res.status(500).json({ message: 'Serverfehler beim Login' });
   }
 });
-
 //Login Status prüfen
 app.get('/me', authenticateJWT, (req, res) => {
   res.json({ loggedIn: true, user: req.user });
+});
+
+
+//Route für Registrierung
+app.post('/register', async (req, res) => {
+  console.log("📥 POST /register erhalten:", req.body);
+
+  const { username, email, password } = req.body;
+
+  if (!username || !email || !password) {
+    console.log("⚠️ Fehlende Felder");
+    return res.status(400).json({ message: 'Alle Felder erforderlich' });
+  }
+
+  try {
+    const existing = await findUserByUsername(username);
+    if (existing) {
+      console.log("⚠️ Benutzername bereits vergeben");
+      return res.status(409).json({ message: 'Benutzername bereits vergeben' });
+    }
+
+    const result = await createUser({ username, email, password });
+    if (result.success) {
+      console.log("✅ Benutzer erstellt");
+      return res.status(201).json({ message: 'Benutzer erfolgreich erstellt' });
+    } else {
+      console.log("❌ Fehler bei createUser:", result);
+      return res.status(500).json({ message: 'Registrierung fehlgeschlagen', error: result.message });
+    }
+  } catch (error) {
+    console.error('❌ Fehler bei Registrierung (Catch):', error);
+    return res.status(500).json({ message: 'Interner Serverfehler', error: error.message });
+  }
 });
 
 
@@ -124,6 +166,10 @@ app.get('/', (req, res) => {
 
 app.get('/Results.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../../Frontend/src/pages', 'Results.html')); // Zwei Ebenen hoch
+});
+
+app.get('/createAccount.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../Frontend/src/pages', 'createAccount.html'));
 });
 
 // === API Endpoint ===

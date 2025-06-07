@@ -3,13 +3,20 @@
 // Erstellt users.db mit Test-Daten
 // ================================
 
-const sqlite3 = require("sqlite3").verbose();
-const bcrypt = require("bcryptjs");
+import sqlite3pkg from "sqlite3";
+import bcrypt from "bcryptjs";
+import path from "path";
+import { fileURLToPath } from "url";
 
+
+const sqlite3 = sqlite3pkg.verbose();
 console.log("🗄️  Creating SQLite database...");
 
 // Datenbank erstellen/öffnen
-const db = new sqlite3.Database("./users.db", (err) => {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const dbpath = path.resolve(__dirname, 'users.db');
+const db = new sqlite3.Database(dbpath, (err) => {
   if (err) {
     console.error("❌ Database connection error:", err);
     process.exit(1);
