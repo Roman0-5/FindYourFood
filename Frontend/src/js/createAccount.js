@@ -1,47 +1,32 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("register-form");
-
-  console.log("📦 createAccount.js geladen");
+  const form    = document.getElementById("create-account-form");
+  const message = document.getElementById("message");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    message.textContent = "";
 
-    const username = document.getElementById("username").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    if (!username || !email || !password) {
-      alert("❗ Bitte alle Felder ausfüllen.");
-      return;
-    }
+    const payload = {
+      username: form.username.value.trim(),
+      email:    form.email.value.trim(),
+      password: form.password.value
+    };
 
     try {
-      const res = await fetch("/register", {
-        method: "POST",
+      const res  = await fetch("/register", {
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
+        body:    JSON.stringify(payload)
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
 
-      const text = await res.text();
-console.log("📄 Serverantwort:", text);
-let data;
-try {
-  data = JSON.parse(text);
-} catch (err) {
-  console.error("❌ Keine gültige JSON-Antwort:", err);
-  alert("❌ Serverfehler – Details siehe Konsole.");
-  return;
-}
-
-      if (res.ok) {
-        alert("✅ Registrierung erfolgreich! Du kannst dich nun einloggen.");
-        window.location.href = "login.html";
-      } else {
-        alert("❌ " + (data.message || "Fehler bei der Registrierung."));
-      }
+      message.style.color   = "green";
+      message.textContent   = "✅ Registrierung erfolgreich! Weiterleitung…";
+      setTimeout(() => window.location.href = "login.html", 1500);
     } catch (err) {
-      console.error("Registrierung fehlgeschlagen:", err);
-      alert("❌ Netzwerkfehler.");
+      message.style.color   = "var(--color-accent)";
+      message.textContent   = `❌ ${err.message}`;
     }
   });
 });

@@ -7,7 +7,7 @@ body {
     font-family: 'Bowlby One', cursive; /* Markante Schriftart für Branding */
 }
 
-/* === Header-Bereich (Branding oben) === 
+/* === Header-Bereich (Branding oben) ===
    Enthält das Logo (als Text) und den Slogan.
 */
 .branding {
@@ -23,7 +23,7 @@ body {
 /* Farben für einzelne Wörter im Logo */
 .highlight { color: #70311C; } /* Braun für "Find" und "Food" */
 .your { color: #B33C3C; } /* Rotes "Your" im Logo */
-.block { 
+.block {
     display: block; /* Zeilenumbruch für "Food" */
     margin-top: 10px;
 }
@@ -46,7 +46,7 @@ body {
     font-weight: bold;
 }
 
-/* === Main-Bereich === 
+/* === Main-Bereich ===
    Zentraler Inhaltsbereich, hier ist die Gast-Suche platziert.
 */
 main {
@@ -58,7 +58,7 @@ main {
     padding: 1rem;
     overflow-y: auto; /* erlaubt, bei Bedarf zu scrollen */
 }
-/* === Gast-Suche === 
+/* === Gast-Suche ===
    Optisch hervorgehobene Suchbox für Gäste.
 */
 .guest-search {
@@ -79,7 +79,7 @@ main {
     margin-bottom: 20px;
 }
 
-/* === Formularfelder === 
+/* === Formularfelder ===
    Gestalten die Input- und Select-Felder einheitlich.
 */
 .search-form input[type="text"],
@@ -131,7 +131,7 @@ main {
     text-align: left;
 }
 
-/* === Footer-Bereich === 
+/* === Footer-Bereich ===
    Footer wird automatisch ans Seitenende geschoben.
 */
 footer {
