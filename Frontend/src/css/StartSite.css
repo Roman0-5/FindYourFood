@@ -196,3 +196,49 @@ footer {
         align-items: center;
     }
 }
+/* Ergebnisse als klappbare Karten */
+.results-container {
+    margin-top: var(--spacing-lg);
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 var(--spacing-md);
+}
+
+.results-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.result-item {
+    background: #fff;
+    border-radius: var(--spacing-sm);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: var(--spacing-md);
+    overflow: hidden;
+}
+
+.result-item summary {
+    padding: var(--spacing-md);
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+}
+
+.result-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.result-item[open] summary {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.result-item p {
+    padding: 0 var(--spacing-md) var(--spacing-md);
+    margin: 0;
+    font-size: 0.9rem;
+    color: #333;
+}

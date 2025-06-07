@@ -1,65 +1,92 @@
-/* Grundstil für das Formular */
-form {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
+/* Create Account Seite – zentriert, ohne Nav */
+
+body {
+  margin: 0;
+  font-family: var(--font-base);
+  background: var(--color-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-/* Stil für die Labels */
-label {
+.form-container {
+  background: var(--color-bg);
+  padding: var(--spacing-lg);
+  border-radius: var(--spacing-md);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+
+.form-container h1 {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-headline);
+  font-size: 1.8rem;
+  color: var(--color-primary);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-md);
+  text-align: left;
+}
+
+.form-group label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: var(--spacing-xs);
   font-weight: bold;
-}
-
-/* Responsive Eingabefelder */
-input {
-  width: 100%; /* Nutzt die volle Breite des Containers */
-  padding: 10px 12px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  box-sizing: border-box; /* Wichtig: Stellt sicher, dass Padding innen liegt */
-}
-
-/* Fokus-Stil für Eingabefelder */
-input:focus {
-  border-color: #4a90e2;
-  outline: none;
-  box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
-}
-
-/* Stil für Buttons */
-button {
-  padding: 10px 15px;
-  margin-right: 10px;
-  background-color: #4a90e2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-button[type="reset"] {
-  background-color: #ccc;
   color: #333;
 }
 
-button:hover {
-  opacity: 0.9;
+.form-group input {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
-/* Responsive Design für verschiedene Bildschirmgrößen */
-@media (max-width: 480px) {
-  form {
-    padding: 10px;
-  }
+.button-group {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  margin-top: var(--spacing-md);
+}
 
-  button {
-    width: 100%;
-    margin-bottom: 10px;
-    margin-right: 0;
-  }
+.btn {
+  flex: 1;
+  padding: var(--spacing-sm) 0;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background: var(--color-primary);
+  color: #fff;
+  transition: background 0.2s ease;
+}
+
+.submit-btn:hover {
+  background: #5a2613;
+}
+
+.reset-btn {
+  background: #ccc;
+  color: #333;
+  transition: background 0.2s ease;
+}
+
+.reset-btn:hover {
+  background: #aaa;
+}
+
+#message {
+  margin-top: var(--spacing-md);
+  font-size: 0.9rem;
+  color: var(--color-accent);
+  min-height: 1.2em;
 }

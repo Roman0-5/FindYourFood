@@ -1,98 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Search Results</title>
-        <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="../css/results.css">
-        <script type="module" src="../js/results.js" defer></script>
-        <link rel="stylesheet" href="../css/accountDropdown.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/results.css">
+    <script type="module" src="../js/results.js" defer></script>
+    <link rel="stylesheet" href="../css/accountDropdown.css">
     <script src="../js/accountDropdown.js" defer></script>
-    </head>
+</head>
 <body>
-    <nav class="main-nav">
-        <ul>
-            <li><a href="StartSite.html">🏠 Home</a></li>
+<nav class="main-nav">
+    <ul>
+        <li><a href="StartSite.html">🏠 Home</a></li>
+        <!-- ... Rest der Navigation bleibt wie gehabt ... -->
+        <li class="dropdown" id="accountDropdown">
+            <button class="dropdown-btn" id="accountBtn">
+                👤 Account
+                <span class="dropdown-arrow">▼</span>
+            </button>
+            <div class="dropdown-content" id="accountDropdownContent">
+                <a href="login.html" class="dropdown-item">
+                    <span class="dropdown-item-icon">🔑</span>
+                    Anmelden
+                </a>
+                <a href="createAccount.html" class="dropdown-item">
+                    <span class="dropdown-item-icon">✨</span>
+                    Account erstellen
+                </a>
+            </div>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <span class="user-name" id="userName">Admin</span>
+                <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="dropdown-content" id="userDropdownContent" style="display: none;">
+                <a href="#" class="dropdown-item" id="geschmacksprofil">
+                    <span class="dropdown-item-icon">🍽️</span>
+                    Geschmacksprofil
+                </a>
+                <a href="#" class="dropdown-item">
+                    <span class="dropdown-item-icon">⭐</span>
+                    Meine Favoriten
+                </a>
+                <a href="#" class="dropdown-item">
+                    <span class="dropdown-item-icon">⚙️</span>
+                    Einstellungen
+                </a>
+                <a href="#" class="dropdown-item logout-item" id="logoutBtn">
+                    <span class="dropdown-item-icon">🚪</span>
+                    Abmelden
+                </a>
+            </div>
+        </li>
+    </ul>
+</nav>
+<header class="branding">
+    <h1 class="headline">
+        <span class="highlight">Find</span>
+        <span class="your">Your</span>
+        <span class="highlight block">Food</span>
+    </h1>
+    <p class="slogan">
+        <span class="subtle">Less</span>
+        <span class="action">scrolling</span>.
+        <span class="subtle">More</span>
+        <span class="action">eating</span>.
+    </p>
+</header>
 
-            <!-- Account Dropdown -->
-            <li class="dropdown" id="accountDropdown">
-                <!-- Wenn NICHT eingeloggt: Account Button -->
-                <button class="dropdown-btn" id="accountBtn">
-                    👤 Account
-                    <span class="dropdown-arrow">▼</span>
-                </button>
+<main>
+    <section class="search-results">
+        <h2>Results for your search</h2>
+        <div id="results-container"></div>
+    </section>
+</main>
 
-                <!-- Wenn NICHT eingeloggt: Dropdown Content -->
-                <div class="dropdown-content" id="accountDropdownContent">
-                    <a href="login.html" class="dropdown-item">
-                        <span class="dropdown-item-icon">🔑</span>
-                        Anmelden
-                    </a>
-                    <a href="createAccount.html" class="dropdown-item">
-                        <span class="dropdown-item-icon">✨</span>
-                        Account erstellen
-                    </a>
-                </div>
-
-                <!-- Wenn EINGELOGGT: User Info -->
-                <div class="user-info" id="userInfo" style="display: none;">
-                    <div class="user-avatar" id="userAvatar">A</div>
-                    <span class="user-name" id="userName">Admin</span>
-                    <span class="dropdown-arrow">▼</span>
-                </div>
-
-                <!-- Wenn EINGELOGGT: Dropdown Content -->
-                <div class="dropdown-content" id="userDropdownContent" style="display: none;">
-                    <a href="#" class="dropdown-item" id="geschmacksprofil">
-                        <span class="dropdown-item-icon">🍽️</span>
-                        Geschmacksprofil
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">⭐</span>
-                        Meine Favoriten
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">⚙️</span>
-                        Einstellungen
-                    </a>
-                    <a href="#" class="dropdown-item logout-item" id="logoutBtn">
-                        <span class="dropdown-item-icon">🚪</span>
-                        Abmelden
-                    </a>
-                </div>
-            </li>
-        </ul>
-    </nav>
-    <header class="branding">
-        <h1 class="headline">
-            <span class="highlight">Find</span>
-            <span class="your">Your</span>
-            <span class="highlight block">Food</span>
-        </h1>
-        <p class="slogan">
-            <span class="subtle">Less</span>
-            <span class="action">scrolling</span>.
-            <span class="subtle">More</span>
-            <span class="action">eating</span>.
-        </p>
-    </header>
-
-    <main>
-<section class="search-results">
-  <h2>Results for your search</h2>
-  <div id="results-container"></div>
-</section>
-    </main>
-
-
-    <footer>
-        <ul class="footer-nav">
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Imprint</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
-    </footer>
+<footer>
+    <ul class="footer-nav">
+        <li><a href="/about.html">About Us</a></li>
+        <li><a href="/imprint.html">Imprint</a></li>
+        <li><a href="/privacy.html">Privacy Policy</a></li>
+        <li><a href="/contact.html">Contact</a></li>
+    </ul>
+</footer>
 </body>
 </html>

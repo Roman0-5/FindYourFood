@@ -1,5 +1,17 @@
-/*
-css müssen in einem FlexGrid sein. Wie es aufgeteilt ist, besprechen wir noch.
-Farben sind noch nicht final, aber etwas das an Essen errinert ist ein guter Ansatz.
+:root {
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
 
-*/
+    /* Farben (Figma) */
+    --color-primary:   #70311C;
+    --color-secondary: #F5E3C3;
+    --color-accent:    #f8c882;
+    --color-bg:        #FFFFFF;
+
+    /* Schrift */
+    --font-headline: 'Bowlby One', cursive;
+    --font-base:     sans-serif;
+}

@@ -20,10 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
+      if (data.token) localStorage.setItem("token", data.token);
 
       message.style.color   = "green";
       message.textContent   = "✅ Registrierung erfolgreich! Weiterleitung…";
-      setTimeout(() => window.location.href = "login.html", 1500);
+      setTimeout(() => (window.location.href = "/"), 1500);
     } catch (err) {
       message.style.color   = "var(--color-accent)";
       message.textContent   = `❌ ${err.message}`;

@@ -80,6 +80,7 @@ app.get('/me', authenticateJWT, (req, res) => {
 });
 
 // GET /api/users/me – Profil des eingeloggten Nutzers
+
 app.get('/api/users/me', authenticateJWT, async (req, res) => {
   try {
     const user = await findUserByUsername(req.user.name);
@@ -120,8 +121,12 @@ app.post('/register', async (req, res) => {
 
     const result = await createUser({ username, email, password });
     if (result.success) {
-      console.log("✅ Benutzer erstellt");
-      return res.status(201).json({ message: 'Benutzer erfolgreich erstellt' });
+      const token = jwt.sign(
+          { name: username, id: result.userId },
+          process.env.ACCESS_TOKEN_SECRET,
+          { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+      );
+      return res.status(201).json({ message: 'Benutzer erstellt', token });
     } else {
       console.log("❌ Fehler bei createUser:", result);
       return res.status(500).json({ message: 'Registrierung fehlgeschlagen', error: result.message });

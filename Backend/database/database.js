@@ -46,3 +46,19 @@ export async function findUserByUsername(username) {
 export async function verifyPassword(plain, hash) {
   return bcrypt.compare(plain, hash);
 }
+// Update User (nur username & email)
+export async function updateUser({ id, username, email }) {
+  const db = await openDb();
+  try {
+    await db.run(
+        'UPDATE users SET username = ?, email = ? WHERE id = ?',
+        [username, email, id]
+    );
+    return { success: true };
+  } catch (err) {
+    if (err.message.includes('UNIQUE')) {
+      return { success: false, message: 'Username oder E-Mail bereits vergeben' };
+    }
+    throw err;
+  }
+}

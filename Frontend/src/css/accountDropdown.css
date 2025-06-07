@@ -1,12 +1,11 @@
 /* === ACCOUNT DROPDOWN NAVIGATION === */
 
-/* Erweiterte Navigation Styles */
 nav.main-nav {
     background-color: #70311C;
     padding: 10px 20px;
     display: flex;
     justify-content: flex-end;
-    position: relative; /* Wichtig für Dropdown */
+    position: relative;
 }
 
 nav.main-nav ul {
@@ -19,7 +18,7 @@ nav.main-nav ul {
 }
 
 nav.main-nav li {
-    position: relative; /* Wichtig für Dropdown */
+    position: relative;
 }
 
 nav.main-nav li a {
@@ -39,13 +38,11 @@ nav.main-nav li a:hover {
 
 /* === DROPDOWN STYLES === */
 
-/* Dropdown Container */
 .dropdown {
     position: relative;
     display: inline-block;
 }
 
-/* Dropdown Button */
 .dropdown-btn {
     background: none;
     border: none;
@@ -67,7 +64,6 @@ nav.main-nav li a:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Dropdown Arrow */
 .dropdown-arrow {
     font-size: 0.8rem;
     transition: transform 0.3s ease;
@@ -79,11 +75,11 @@ nav.main-nav li a:hover {
 
 /* Dropdown Content */
 .dropdown-content {
-    display: none !important; /* WICHTIG: Immer versteckt bis Toggle */
+    display: none !important;
     position: absolute;
     top: 100%;
     right: 0;
-    background-color: #ffffff; /* Weißer Hintergrund */
+    background-color: #ffffff;
     min-width: 220px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
     border-radius: 8px;
@@ -92,8 +88,9 @@ nav.main-nav li a:hover {
     border: 2px solid #70311C;
 }
 
+/* Nur wenn .show gesetzt */
 .dropdown-content.show {
-    display: block !important; /* Nur sichtbar mit .show Klasse */
+    display: block !important;
     animation: dropdownFadeIn 0.3s ease;
 }
 
@@ -112,8 +109,8 @@ nav.main-nav li a:hover {
 .dropdown-item {
     display: block;
     padding: 14px 20px;
-    color: #000000 !important; /* Schwarzer Text - sehr wichtig! */
-    background-color: #ffffff; /* Weißer Hintergrund */
+    color: #000000 !important;
+    background-color: #ffffff;
     text-decoration: none;
     font-weight: bold;
     transition: all 0.3s ease;
@@ -127,16 +124,15 @@ nav.main-nav li a:hover {
 }
 
 .dropdown-item:hover {
-    background-color: #f8c882 !important; /* Gelber Hover-Hintergrund */
-    color: #000000 !important; /* Schwarzer Text bleibt */
+    background-color: #f8c882 !important;
+    color: #000000 !important;
 }
 
 .dropdown-item:active {
     background-color: #70311C !important;
-    color: #ffffff !important; /* Nur beim Klicken weiß */
+    color: #ffffff !important;
 }
 
-/* Icons in Dropdown */
 .dropdown-item-icon {
     margin-right: 8px;
     font-size: 1.1rem;
@@ -144,7 +140,6 @@ nav.main-nav li a:hover {
 
 /* === USER INFO STYLES === */
 
-/* User Info Display */
 .user-info {
     display: flex;
     align-items: center;
@@ -183,133 +178,52 @@ nav.main-nav li a:hover {
 
 /* === SPECIAL DROPDOWN ITEMS === */
 
+/* Logout-Item standardmäßig ausblenden */
+#accountDropdownContent .user.logout-item {
+    display: none;
+}
+
+/* Geschmacksprofil-Item ausblenden */
+#accountDropdownContent .user.geschmacksprofil-item {
+    display: none;
+}
+
+/* Nur Gäste sehen diese Items */
+#accountDropdownContent .guest {
+    display: block;
+}
+
+/* Alle User-Links im Dropdown standardmäßig ausblenden */
+#accountDropdownContent .user {
+    display: none;
+}
+
 /* Logout Button Styling */
 .logout-item {
-    background-color: #ffe6e6 !important; /* Hellrosa Hintergrund */
-    color: #cc0000 !important; /* Dunkelroter Text */
+    background-color: #ffe6e6 !important;
+    color: #cc0000 !important;
     border-top: 2px solid #f8c882;
 }
 
 .logout-item:hover {
-    background-color: #ffcccc !important; /* Etwas dunkler rosa beim Hover */
-    color: #990000 !important; /* Noch dunklerer roter Text */
+    background-color: #ffcccc !important;
+    color: #990000 !important;
 }
 
-/* Geschmacksprofil Item (für später) */
+/* Geschmacksprofil Item */
 .geschmacksprofil-item {
     background-color: #fff8e1 !important;
     border-top: 1px solid #f8c882;
-    color: #000000 !important; /* Schwarzer Text */
+    color: #000000 !important;
 }
 
 .geschmacksprofil-item:hover {
     background-color: #f8c882 !important;
-    color: #000000 !important; /* Schwarzer Text bleibt beim Hover */
+    color: #000000 !important;
 }
 
 /* === RESPONSIVE DESIGN === */
-
-@media (max-width: 600px) {
-    /* Navigation Mobile */
-    nav.main-nav {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    nav.main-nav ul {
-        flex-direction: column;
-        width: 100%;
-        gap: 0;
-    }
-
-    nav.main-nav li,
-    .dropdown {
-        width: 100%;
-    }
-
-    /* Dropdown Button Mobile */
-    .dropdown-btn,
-    .user-info {
-        width: 100%;
-        justify-content: space-between;
-        padding: 15px;
-    }
-
-    /* Dropdown Content Mobile */
-    .dropdown-content {
-        position: static;
-        display: none !important; /* Wichtig: Standardmäßig versteckt auch auf Mobile */
-        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-        border: none;
-        border-radius: 0;
-        background-color: rgba(255, 255, 255, 0.95);
-    }
-
-    .dropdown-content.show {
-        display: block !important; /* Nur anzeigen wenn .show Klasse vorhanden */
-    }
-
-    .dropdown-item {
-        padding: 15px 30px;
-        font-size: 0.9rem;
-        color: #333 !important; /* Schwarzer Text auch auf Mobile */
-    }
-
-    .dropdown-item:hover {
-        color: #000 !important; /* Schwarzer Text beim Hover auf Mobile */
-    }
-
-    /* Navigation Links Mobile */
-    nav.main-nav li a {
-        padding: 15px;
-        display: block;
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .dropdown-item {
-        padding: 12px 25px;
-        font-size: 0.8rem;
-    }
-
-    .dropdown-item-icon {
-        font-size: 1rem;
-        margin-right: 6px;
-    }
-
-    .user-avatar {
-        width: 25px;
-        height: 25px;
-        font-size: 0.8rem;
-    }
-
-    .user-name {
-        font-size: 0.8rem;
-    }
-}
+/* ... (dein bereits vorhandenes Media-Queries) ... */
 
 /* === ANIMATION IMPROVEMENTS === */
-
-/* Smooth transitions */
-.dropdown-btn,
-.user-info,
-.dropdown-item {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Focus states for accessibility */
-.dropdown-btn:focus,
-.dropdown-item:focus {
-    outline: 2px solid #f8c882;
-    outline-offset: 2px;
-}
-
-/* Active states */
-.dropdown-btn:active {
-    transform: scale(0.98);
-}
-
-.dropdown-item:active {
-    transform: translateX(2px);
-}
+/* ... (deine bereits vorhandenen Transitionen) ... */
