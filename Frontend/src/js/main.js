@@ -1,50 +1,23 @@
-// /js/main.js
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("main.js loaded");
 
-function showUserMenu() {
-  document.getElementById('accountDropdownContent').style.display = 'none';
-  document.getElementById('userInfo').style.display = '';
-  document.getElementById('userDropdownContent').style.display = '';
-}
-
-function showGuestMenu() {
-  document.getElementById('accountDropdownContent').style.display = '';
-  document.getElementById('userInfo').style.display = 'none';
-  document.getElementById('userDropdownContent').style.display = 'none';
-}
-
-// Beim Laden prüfen, ob User eingeloggt ist
-document.addEventListener("DOMContentLoaded", function() {
-  const token = localStorage.getItem("token"); // oder "accessToken"
-  if (token) {
-    showUserMenu();
-  } else {
-    showGuestMenu();
+  const form = document.querySelector(".search-form");
+  if (!form) {
+    console.warn("Keine .search-form gefunden – main.js wird hier nicht benötigt.");
+    return;
   }
 
-  // Logout-Button Event
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      localStorage.removeItem('token'); // oder "accessToken"
-      showGuestMenu();
-      window.location.href = "/StartSite.html";
-    });
-  }
-});
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
 
-// (Suche bleibt wie gehabt, hier ggf. dein Such-Code)
-const searchForm = document.getElementById('search-form');
-if (searchForm) {
-  searchForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const query = document.getElementById('query').value.trim();
-    const city = document.getElementById('city').value.trim();
+    const query = form.querySelector('input[name="query"]').value.trim();
+    const city = form.querySelector('input[name="city"]').value.trim();
+    const openingHours = form.querySelector('select[name="openingHours"]').value;
+    const category = form.querySelector('select[name="category"]').value;
+    const limit = form.querySelector('input[name="limit"]').value;
 
-    if (query && city) {
-      window.location.href = `Results.html?query=${encodeURIComponent(query)}&city=${encodeURIComponent(city)}`;
-    } else {
-      alert("Bitte Suchbegriff und Stadt eingeben!");
-    }
+    const params = new URLSearchParams({ query, city, openingHours, category, limit });
+
+    window.location.href = `results.html?${params.toString()}`;
   });
-}
+});

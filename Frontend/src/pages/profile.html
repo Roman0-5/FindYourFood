@@ -1,24 +1,76 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="/css/styles.css" />
-  <link rel="stylesheet" href="/css/profile.css" />
-  <title>FindYourFood – Profil</title>
-</head>
-<body class="container">
-<!-- dynamische Nav -->
-<nav id="main-nav" class="text-center mb-md"></nav>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil bearbeiten - FindYourFood</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/StartSite.css" />
+    <link rel="stylesheet" href="../css/accountDropdown.css" />
+    <script type="module" src="../js/main.js" defer></script>
+    <script src="../js/accountDropdown.js" defer></script>
+    <script src="../js/navbar.js" defer></script>
+    <script src="../js/profile.js" defer></script>
+  </head>
+  <body>
+    <div id="navbarContainer"></div>
 
-<div class="form-container mt-md">
-  <h2>Dein Profil</h2>
-  <div id="profile-info">
-    <!-- wird von profile.js befüllt -->
-  </div>
-</div>
+    <!-- Header -->
+    <header class="branding">
+      <h1 class="headline">
+        <span class="highlight">Find</span>
+        <span class="your">Your</span>
+        <span class="highlight block">Food</span>
+      </h1>
+      <p class="slogan">
+        <span class="subtle">Less</span>
+        <span class="action">scrolling</span>.
+        <span class="subtle">More</span>
+        <span class="action">eating</span>.
+      </p>
+    </header>
 
-<script src="/js/main.js"></script>
-<script src="/js/profile.js"></script>
-</body>
+    <!-- Main Content -->
+    <main>
+      <section class="guest-search">
+        <h2>Profil bearbeiten</h2>
+
+        <form id="profileForm">
+          <div class="form-group">
+            <label for="username">Benutzername</label>
+            <input type="text" id="username" name="username"/>
+          </div>
+
+          <div class="form-group">
+            <label for="email">E-Mail-Adresse</label>
+            <input type="email" id="email" name="email"/>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Neues Passwort</label>
+            <input type="password" id="password" name="password" />
+          </div>
+
+          <button type="submit">💾 Änderungen speichern</button>
+        </form>
+
+        <hr style="margin: 2rem 0; border: 1px dashed #B33C3C;" />
+
+        <h3 style="color: #B33C3C;">⚠️ Account löschen</h3>
+        <p style="font-size: 0.9rem;">Dieser Vorgang kann nicht rückgängig gemacht werden!</p>
+
+        <button id="deleteAccountBtn">❌ Account dauerhaft löschen</button>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <ul class="footer-nav">
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="imprint.html">Impressum</a></li>
+        <li><a href="privacy.html">Datenschutz</a></li>
+        <li><a href="contact.html">Kontakt</a></li>
+      </ul>
+    </footer>
+  </body>
 </html>

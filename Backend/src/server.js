@@ -21,6 +21,8 @@ import fetch from 'node-fetch';
 //import session from 'express-session'; - löschen wenn JWT implementiert
 import swaggerUi from 'swagger-ui-express';
 import { swaggerDocument } from './swagger.js';
+import { updateUser } from '../database/database.js';
+import { deleteUserById } from '../database/database.js';
 
 // Für __dirname in ES-Modulen
 
@@ -139,43 +141,6 @@ app.post('/register', async (req, res) => {
 
 
 
-
-/*
-
-// === Session Management ===import dotenv from 'dotenv';
-app.use(session({
-  secret: 'mySecretKey',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } // In dev okay
-}));
-
-
-app.post('/login', express.json(), (req, res) => {
-  const { username, password } = req.body;
-  if (username === 'admin' && password === 'pass') {
-    req.session.user = { name: 'admin' };
-    res.json({ message: 'Login erfolgreich' });
-  } else {
-    res.status(401).json({ message: 'Login fehlgeschlagen' });
-  }
-});
-
-app.post('/logout', (req, res) => {
-  req.session.destroy();
-  res.json({ message: 'Logout erfolgreich' });
-});
-
-app.get('/session-check', (req, res) => {
-  if (req.session.user) {
-    res.json({ loggedIn: true, user: req.session.user });
-  } else {
-    res.json({ loggedIn: false });
-  }
-});
-
-*/
-
 // === Swagger UI ===
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -183,7 +148,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.static(path.join(__dirname, '../../Frontend/src/pages'))); // Zwei Ebenen hoch
 app.use('/js', express.static(path.join(__dirname, '../../Frontend/src/js')));
 app.use('/css', express.static(path.join(__dirname, '../../Frontend/src/css')));
-
+app.use('/partials', express.static(path.join(__dirname, '../../Frontend/src/partials')));
 // === HTML-Seiten Routing ===
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../../Frontend/src/pages', 'StartSite.html')); // Zwei Ebenen hoch
@@ -233,6 +198,56 @@ app.get('/search', async (req, res) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
+// PUT /api/users/me – Profil aktualisieren
+app.put('/api/users/me', authenticateJWT, async (req, res) => {
+  const { username, email, password } = req.body;
+
+  if (!username && !email && !password) {
+    return res.status(400).json({ message: 'Mindestens ein Feld muss angegeben werden' });
+  }
+
+  try {
+    const user = await findUserByUsername(req.user.name);
+    if (!user) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+    }
+
+    const updatedUser = { id: user.id };
+    if (username) updatedUser.username = username;
+    if (email) updatedUser.email = email;
+    if (password) {
+      updatedUser.password_hash = await bcrypt.hash(password, 10);
+    }
+
+    const result = await updateUser(updatedUser);
+
+    if (result.success) {
+      return res.json({ message: 'Profil aktualisiert' });
+    } else {
+      return res.status(500).json({ message: 'Aktualisierung fehlgeschlagen', error: result.error });
+    }
+  } catch (err) {
+    console.error('❌ Fehler bei Profil-Update:', err);
+    res.status(500).json({ message: 'Interner Serverfehler' });
+  }
+});
+
+app.delete('/api/users/me', authenticateJWT, async (req, res) => {
+  try {
+    const result = await deleteUserById(req.user.id);
+
+    if (!result.success) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden oder Fehler beim Löschen' });
+    }
+
+    res.json({ message: 'Account gelöscht' });
+  } catch (err) {
+    console.error("❌ Fehler beim Löschen des Accounts:", err);
+    res.status(500).json({ message: 'Fehler beim Löschen des Accounts' });
+  }
+});
+
 
 // Server starten
 app.listen(PORT, () => {

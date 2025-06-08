@@ -1,141 +1,112 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FindYourFood - Home</title>
-  <link
-          href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap"
-          rel="stylesheet"
-  />
-  <!-- ABSOLUTE PFADEN -->
-  <link rel="stylesheet" href="/css/StartSite.css" />
-  <link rel="stylesheet" href="/css/accountDropdown.css" />
-  <!-- erst Dropdown-Logik, dann main.js für Suche/Navigation -->
-  <script src="/js/accountDropdown.js" defer></script>
-  <script type="module" src="/js/main.js" defer></script>
-</head>
-<body>
-<!-- Navigation mit Account Dropdown -->
-<nav class="main-nav">
-  <ul>
-    <li><a href="StartSite.html">🏠 Home</a></li>
-    <li class="dropdown" id="accountDropdown">
-      <button class="dropdown-btn" id="accountBtn">
-        👤 Account <span class="dropdown-arrow">▼</span>
-      </button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FindYourFood - Home</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/StartSite.css" />
+    <link rel="stylesheet" href="../css/accountDropdown.css" />
+    <script type="module" src="../js/main.js" defer></script>
+    <script src="../js/accountDropdown.js" defer></script>
+    <script src="../js/login.js" defer></script>
+    <script src="../js/navbar.js" defer></script>
+  </head>
+  <body>
+ 
 
-      <div class="dropdown-content" id="accountDropdownContent" style="display:none!important">
-        <a href="login.html" class="dropdown-item guest">
-          <span class="dropdown-item-icon">🔑</span> Anmelden
-        </a>
-        <a href="createAccount.html" class="dropdown-item guest">
-          <span class="dropdown-item-icon">✨</span> Account erstellen
-        </a>
-      </div>
+<div id="navbarContainer"></div>
 
-      <div class="user-info" id="userInfo" style="display:none">
-        <div class="user-avatar" id="userAvatar">A</div>
-        <span class="user-name" id="userName">Admin</span>
-        <span class="dropdown-arrow">▼</span>
-      </div>
+    <!-- Header mit Logo (bestehend) -->
+    <header class="branding">
+      <h1 class="headline">
+        <span class="highlight">Find</span>
+        <span class="your">Your</span>
+        <span class="highlight block">Food</span>
+      </h1>
+      <p class="slogan">
+        <span class="subtle">Less</span>
+        <span class="action">scrolling</span>.
+        <span class="subtle">More</span>
+        <span class="action">eating</span>.
+      </p>
+    </header>
 
-      <div class="dropdown-content" id="userDropdownContent" style="display:none!important">
-        <a href="geschmacksprofil.html" class="dropdown-item user" id="geschmacksprofil">
-          <span class="dropdown-item-icon">🍽️</span> Geschmacksprofil
-        </a>
-        <a href="#" class="dropdown-item user">
-          <span class="dropdown-item-icon">⭐</span> Meine Favoriten
-        </a>
-        <a href="#" class="dropdown-item user">
-          <span class="dropdown-item-icon">⚙️</span> Einstellungen
-        </a>
-        <a href="#" id="logoutBtn" class="dropdown-item logout-item user">
-          <span class="dropdown-item-icon">🚪</span> Abmelden
-        </a>
-      </div>
-    </li>
-  </ul>
-</nav>
+    <!-- Main Content (bestehend) -->
+    <main>
+      <section class="guest-search">
+        <h2>Quick Search – No Account Needed!</h2>
+        <form class="search-form">
+          <input
+            type="text"
+            name="query"
+            placeholder="Search by restaurant name, dish or keyword"
+            required
+          />
+          <input
+            type="text"
+            name="city"
+            placeholder="Enter city (e.g., Vienna)"
+            required
+          />
 
-<!-- Header mit Logo (bestehend) -->
-<header class="branding">
-  <h1 class="headline">
-    <span class="highlight">Find</span>
-    <span class="your">Your</span>
-    <span class="highlight block">Food</span>
-  </h1>
-  <p class="slogan">
-    <span class="subtle">Less</span>
-    <span class="action">scrolling</span>.
-    <span class="subtle">More</span>
-    <span class="action">eating</span>.
-  </p>
-</header>
+          <div class="form-group">
+            <label for="openingHours">Opening Hours:</label>
+            <select name="openingHours" id="openingHours">
+              <option value="any">Any Time</option>
+              <option value="openNow">Open Now</option>
+              <option value="nextSevenDays">Open in the Next 7 Days</option>
+              <option value="weekends">Open on Weekends</option>
+            </select>
+          </div>
 
-<!-- Main Content (bestehend) -->
-<main>
-  <section class="guest-search">
-    <h2>Quick Search – No Account Needed!</h2>
-    <!-- ID damit main.js das Formular abfängt -->
-    <form id="search-form" class="search-form">
-      <input
-              type="text"
-              name="query"
-              id="query"
-              placeholder="Search by restaurant name, dish or keyword"
-              required
-      />
-      <input
-              type="text"
-              name="city"
-              id="city"
-              placeholder="Enter city (e.g., Vienna)"
-              required
-      />
+          <div class="form-group">
+            <label for="category">Category:</label>
+            <select name="category" id="category">
+              <option value="">Any</option>
+              <option value="7315025">Italian</option>
+              <option value="7315017">French</option>
+              <option value="7315031">Asian</option>
+              <option value="7315018">Chinese</option>
+              <option value="7315019">Japanese</option>
+              <option value="7315020">Mexican</option>
+              <option value="7315021">Indian</option>
+              <option value="7315022">Thai</option>
+              <option value="7315023">Vegetarian / Vegan</option>
+              <option value="7315024">Fast Food</option>
+              <option value="7315032">Seafood</option>
+              <option value="7315026">Café / Bakery</option>
+            </select>
+          </div>
 
-      <div class="form-group">
-        <label for="openingHours">Opening Hours:</label>
-        <select name="openingHours" id="openingHours">
-          <option value="any">Any Time</option>
-          <option value="openNow">Open Now</option>
-          <option value="nextSevenDays">Next 7 Days</option>
-          <option value="weekends">Weekends</option>
-        </select>
-      </div>
+          <div class="form-group">
+            <label for="limit">Results Limit:</label>
+            <input
+              type="number"
+              name="limit"
+              id="limit"
+              value="5"
+              min="1"
+              max="50"
+            />
+          </div>
 
-      <div class="form-group">
-        <label for="category">Category:</label>
-        <select name="category" id="category">
-          <!-- … Optionen … -->
-        </select>
-      </div>
+          <button type="submit">Search Now</button>
+        </form>
+      </section>
+    </main>
 
-      <div class="form-group">
-        <label for="limit">Results Limit:</label>
-        <input
-                type="number"
-                name="limit"
-                id="limit"
-                value="5"
-                min="1"
-                max="50"
-        />
-      </div>
-
-      <button type="submit">Search Now</button>
-    </form>
-  </section>
-</main>
-
-<!-- Footer (bestehend) -->
-<footer>
-  <ul class="footer-nav">
-    <li><a href="about.html">About Us</a></li>
-    <li><a href="imprint.html">Impressum</a></li>
-    <li><a href="privacy.html">Datenschutz</a></li>
-    <li><a href="contact.html">Kontakt</a></li>
-  </ul>
-</footer>
-</body>
+    <!-- Footer (bestehend) -->
+    <footer>
+      <ul class="footer-nav">
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="imprint.html">Impressum</a></li>
+        <li><a href="privacy.html">Datenschutz</a></li>
+        <li><a href="contact.html">Kontakt</a></li>
+      </ul>
+    </footer>
+  </body>
 </html>
