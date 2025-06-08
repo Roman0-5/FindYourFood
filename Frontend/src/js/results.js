@@ -47,12 +47,51 @@ document.addEventListener("DOMContentLoaded", () => {
         const element = document.createElement("div");
         element.classList.add("result-card");
         element.innerHTML = `
-          <h3>${poi.name}</h3>
-          <p>${poi.phone || "No phone available"}</p>
-          <p>${address.freeformAddress}</p>
-          <p><strong>Category:</strong> ${poi.categories?.[0] || "Unknown"}</p>
-        `;
+      <h3>${poi.name}</h3>
+      <p>${poi.phone || "No phone available"}</p>
+      <p>${address.freeformAddress}</p>
+      <p><strong>Category:</strong> ${poi.categories?.[0] || "Unknown"}</p>
+      <span class="favorite-star"
+            data-name="${poi.name}"
+            data-phone="${poi.phone || ''}"
+            data-address="${address.freeformAddress}"
+            data-category="${poi.categories?.[0] || 'Unknown'}"
+      >☆</span>
+    `;
         container.appendChild(element);
+
+        const star = element.querySelector(".favorite-star");
+            // bestehende Favorites aus dem LocalStorage
+                let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+            // wenn schon in Favorites, Stern füllen
+                const exists = favs.some(f => f.name === poi.name && f.address === address.freeformAddress);
+           if (exists) {
+                star.classList.add("active");
+                star.textContent = "★";
+              }
+            // Klick-Handler: toggle in LocalStorage und UI
+                star.addEventListener("click", () => {
+                    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+                    const item = {
+                        name: star.dataset.name,
+                          phone: star.dataset.phone,
+                          address: star.dataset.address,
+                          category: star.dataset.category
+                    };
+                    const idx = favorites.findIndex(f => f.name === item.name && f.address === item.address);
+                    if (idx === -1) {
+                        // hinzufügen
+                            favorites.push(item);
+                        star.classList.add("active");
+                        star.textContent = "★";
+                      } else {
+                        // entfernen
+                            favorites.splice(idx, 1);
+                        star.classList.remove("active");
+                        star.textContent = "☆";
+                      }
+                    localStorage.setItem("favorites", JSON.stringify(favorites));
+                 });
       });
     })
     .catch(err => {

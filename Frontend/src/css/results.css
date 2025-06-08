@@ -130,3 +130,15 @@ footer {
 
 
 }
+/* Sterne-Icon in den Result-Cards */
+.favorite-star {
+    font-size: 1.5rem;
+    cursor: pointer;
+    float: right;           /* schiebt den Stern nach rechts */
+    margin-top: -2.5rem;    /* hebt ihn in die Ecke */
+    color: #ccc;            /* inaktiv: hellgrau */
+    transition: color 0.2s;
+}
+.favorite-star.active {
+    color: gold;            /* aktiv: gold */
+}
