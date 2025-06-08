@@ -160,12 +160,25 @@ function closeDropdown() {
 
 async function checkSessionForNavigation() {
   try {
-    const response = await fetch("/session-check");
-    const data = await response.json();
+    const res = await fetch("/me", {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+
+    if (!res.ok) {
+      console.warn("Session check fehlgeschlagen mit Status:", res.status);
+      updateNavigationUI(false, null);
+      return { loggedIn: false, user: null };
+    }
+
+    const data = await res.json();
+    const isLoggedIn = data.loggedIn;
 
     console.log("Session check result:", data); // Debug
-    updateNavigationUI(data.loggedIn, data.user);
+    updateNavigationUI(isLoggedIn, data.user);
     return data;
+
   } catch (error) {
     console.error("Session check error:", error);
     updateNavigationUI(false, null);

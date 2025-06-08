@@ -1,4 +1,21 @@
 /* Grundstil für das Formular */
+
+@import url('./login.css');
+
+/* Optional: Anpassungen nur für Register-Seite */
+.login-title {
+  color: #B33C3C; /* z. B. andere Akzentfarbe */
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #B33C3C, #70311C); /* Umgekehrter Verlauf */
+}
+
+/* z. B. Register-spezifische Hinweise */
+#statusMessage {
+  font-style: italic;
+}
+
 form {
   max-width: 600px;
   margin: 0 auto;
@@ -49,6 +66,13 @@ button[type="reset"] {
 
 button:hover {
   opacity: 0.9;
+}
+
+#message {
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: bold;
+  font-family: sans-serif;
 }
 
 /* Responsive Design für verschiedene Bildschirmgrößen */

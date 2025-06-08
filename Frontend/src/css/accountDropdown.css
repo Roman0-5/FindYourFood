@@ -110,16 +110,18 @@ nav.main-nav li a:hover {
 
 /* Dropdown Items */
 .dropdown-item {
-    display: block;
-    padding: 14px 20px;
-    color: #000000 !important; /* Schwarzer Text - sehr wichtig! */
-    background-color: #ffffff; /* Weißer Hintergrund */
-    text-decoration: none;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    border-bottom: 1px solid #e0e0e0;
-    font-family: 'Bowlby One', cursive;
-    font-size: 0.9rem;
+  display: flex;                 /* ✅ ICON + TEXT nebeneinander */
+  align-items: center;          /* ✅ vertikal zentriert */
+  gap: 10px;                    /* ✅ Abstand zwischen Icon und Text */
+  padding: 14px 20px;
+  color: #000000 !important;
+  background-color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #e0e0e0;
+  font-family: 'Bowlby One', cursive;
+  font-size: 0.9rem;
 }
 
 .dropdown-item:last-child {
@@ -138,15 +140,19 @@ nav.main-nav li a:hover {
 
 /* Icons in Dropdown */
 .dropdown-item-icon {
+    display: block;         /* NEU: sorgt für saubere Ausrichtung */
+    width: 24px;                   /* Einheitliche Breite für alle Icons */
+    text-align: center;
     margin-right: 8px;
     font-size: 1.1rem;
+    vertical-align: middle;        /* optional, verbessert Alignment bei Icons */
 }
 
 /* === USER INFO STYLES === */
 
 /* User Info Display */
 .user-info {
-    display: flex;
+    display: inline-blockS;
     align-items: center;
     gap: 10px;
     color: white;

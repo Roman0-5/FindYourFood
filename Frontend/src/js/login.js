@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Session Status prüfen
 async function checkSession() {
-  const token = localStorage.getItem("jwtToken"); //Ist Token da? Falls nicht ist User ausgeloggt
+  const token = localStorage.getItem("token"); //Ist Token da? Falls nicht ist User ausgeloggt
 
   if(!token) {
     updateUIForLoggedOutUser();
@@ -67,8 +67,8 @@ function updateUIForLoggedOutUser() {
 // Form initialisieren
 function initializeForm() {
   // Demo-Daten vorausfüllen (nur für Testing)
-  document.getElementById("username").value = "admin";
-  document.getElementById("password").value = "pass";
+  //document.getElementById("username").value = "admin";
+  //document.getElementById("password").value = "pass";
 
   // Login Form Event Listener
   document.getElementById("login-form").addEventListener("submit", handleLogin);
@@ -114,13 +114,13 @@ async function handleLogin(event) {
     if (response.ok) {
       // Erfolgreiche Anmeldung - speichert JWT im localStorage – wird für spätere Anfragen verwendet
 
-      localStorage.setItem("jwtToken", result.token);
+      localStorage.setItem("token", result.token);
       showStatusMessage("success", `✅ ${result.message}`);
 
 
       // Nach kurzer Verzögerung zur Startseite weiterleiten
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = "/StartSite.html";
       }, 1500);
     } else {
       // Fehlgeschlagene Anmeldung
@@ -142,7 +142,7 @@ async function handleLogin(event) {
 
 // Logout Function - Entfernt JWT → Nutzer gilt als ausgeloggt
 function logout() {
-  localStorage.removeItem("jwtToken");
+  localStorage.removeItem("token");
   showStatusMessage("success", "Erfolgreich abgemeldet");
 
   setTimeout(() => {

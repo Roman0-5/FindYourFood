@@ -1,0 +1,62 @@
+/* === Profil bearbeiten Seite === */
+
+/* Profilformular-Stil */
+#profileForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Eingabefelder */
+#profileForm input {
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Speichern-Button */
+#profileForm button {
+  background-color: #70311C;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#profileForm button:hover {
+  background-color: #B33C3C;
+}
+
+/* Abschnitt Account löschen */
+#deleteAccountBtn {
+  background-color: #cc0000;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#deleteAccountBtn:hover {
+  background-color: #990000;
+}
+
+/* Titel und Warntext */
+h3 {
+  color: #B33C3C;
+}
+
+hr {
+  margin: 2rem 0;
+  border: 1px dashed #B33C3C;
+}
