@@ -3,6 +3,7 @@
 // Globale Variablen
 let currentUser = null;
 let userPreferences = []; // Wird von API geladen
+const container = document.getElementById("recommendationArea");
 
 // Kategorie-Mapping für bessere Anzeige
 const categoryMapping = {
@@ -43,6 +44,7 @@ async function initializeGeschmacksprofil() {
   if (sessionData.loggedIn) {
     showGeschmacksprofilContent(sessionData.user);
     await loadUserPreferences();
+    await loadRecommendation();
   } else {
     showLoginRequired();
   }
@@ -394,6 +396,42 @@ function updatePreferencesDisplay() {
         `
       )
       .join("");
+  }
+}
+
+async function loadRecommendation() {
+  const container = document.getElementById("recommendationArea");
+  container.innerHTML = ""; // Vorherige Inhalte löschen
+
+  try {
+    const res = await fetch("/api/recommendation", {
+      headers: getAuthHeaders(),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success || !data.restaurant) {
+      container.style.display = "none"; // ❌ Recommendation verstecken
+      return;
+    }
+
+    const { restaurant, cuisine } = data;
+    const { poi, address } = restaurant;
+
+    container.innerHTML = `
+      <div class="recommendation-card">
+        <h4>🔍 Empfehlung für dich: ${categoryMapping[cuisine] || cuisine}</h4>
+        <p><strong>${poi.name}</strong></p>
+        <p>${address?.freeformAddress || "Adresse nicht verfügbar"}</p>
+        <p>${poi.phone || "Keine Telefonnummer"}</p>
+        <p><em>${poi.categories?.[0] || "Unbekannte Kategorie"}</em></p>
+      </div>
+    `;
+
+    container.style.display = "block"; // ✅ Nur anzeigen wenn erfolgreich
+  } catch (error) {
+    console.error("❌ Fehler bei der Empfehlung:", error);
+    container.style.display = "none"; // ❌ Auch bei Fehler verstecken
   }
 }
 

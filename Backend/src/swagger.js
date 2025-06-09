@@ -547,5 +547,58 @@ export const swaggerDocument = {
         },
       },
     },
+    "/api/recommendation": {
+  get: {
+    tags: ["Empfehlung"],
+    summary: "Gibt eine Restaurant-Empfehlung basierend auf dem Geschmacksprofil zurück",
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: "Empfehlung erfolgreich geladen",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                success: { type: "boolean", example: true },
+                cuisine: { type: "string", example: "chinese" },
+                restaurant: {
+                  type: "object",
+                  properties: {
+                    poi: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string", example: "Sichuan Wien" },
+                        phone: { type: "string", example: "+43 1 6041742" },
+                        categories: {
+                          type: "array",
+                          items: { type: "string" },
+                          example: ["chinese", "restaurant"],
+                        },
+                      },
+                    },
+                    address: {
+                      type: "object",
+                      properties: {
+                        freeformAddress: {
+                          type: "string",
+                          example: "Humboldtgasse 18, 1100 Wien",
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      401: { description: "Unauthorized – Kein oder ungültiger Token" },
+      404: { description: "Keine Präferenz gespeichert oder keine Empfehlung gefunden" },
+      500: { description: "Serverfehler" },
+    },
+  },
+},
+
   },
 };
