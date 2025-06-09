@@ -1,0 +1,13 @@
+
+# .env
+.env
+
+# .env.* - ignoriert Varianten bspw. env.local oder env.dev
+.env.*
+
+# Node.js
+node_modules/
+
+# IDE
+.idea/
+

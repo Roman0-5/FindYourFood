@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geschmacksprofil - FindYourFood</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/geschmacksprofil.css">
+    <link rel="stylesheet" href="../css/accountDropdown.css">
+    <script src="../js/accountDropdown.js" defer></script>
+    <script src="../js/navbar.js" defer></script>
+</head>
+<body>
+    <div id="navbarContainer"></div>
+
+
+    <!-- Header mit Logo -->
+    <header class="branding">
+        <h1 class="headline">
+            <span class="highlight">Find</span>
+            <span class="your">Your</span>
+            <span class="highlight block">Food</span>
+        </h1>
+        <p class="slogan">
+            <span class="subtle">Less</span>
+            <span class="action">scrolling</span>.
+            <span class="subtle">More</span>
+            <span class="action">eating</span>.
+        </p>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Login Required Warning (wird angezeigt wenn nicht eingeloggt) -->
+        <div class="login-required" id="loginRequired" style="display: none;">
+            <div class="warning-container">
+                <h2>🔒 Anmeldung erforderlich</h2>
+                <p>Um dein Geschmacksprofil zu verwalten, musst du dich zuerst anmelden.</p>
+                <div class="warning-actions">
+                    <a href="login.html" class="btn btn-primary">🔑 Jetzt anmelden</a>
+                    <a href="StartSite.html" class="btn btn-secondary">🏠 Zur Startseite</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Geschmacksprofil Content (wird nur für eingeloggte User angezeigt) -->
+        <div class="geschmacksprofil-content" id="geschmacksprofilContent" style="display: none;">
+            <!-- User Info Header -->
+            <div class="user-header">
+                <div class="user-welcome">
+                    <h2>🍽️ Hallo <span id="userNameDisplay">Admin</span>!</h2>
+                    <p>Verwalte hier deine Lieblings-Küchen und entdecke personalisierte Restaurant-Empfehlungen.</p>
+                </div>
+            </div>
+
+            <!-- Status Messages -->
+            <div id="statusMessage" style="display: none;"></div>
+
+            <!-- Aktuelle Lieblingskategorien -->
+            <section class="current-preferences">
+                <h3>🌟 Deine Lieblings-Küchen</h3>
+                <div class="preferences-container" id="currentPreferences">
+                    <!-- Wird dynamisch gefüllt -->
+                </div>
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <p>🤷‍♂️ Du hast noch keine Lieblings-Küchen ausgewählt.</p>
+                    <p>Füge unten welche hinzu!</p>
+                </div>
+            </section>
+
+            <!-- Neue Kategorien hinzufügen -->
+            <section class="add-preferences">
+                <h3>➕ Neue Küche hinzufügen</h3>
+                <div class="add-form">
+                    <select id="categorySelect" class="category-select">
+                        <option value="">Wähle eine Küche...</option>
+                        <option value="italian">🍝 Italienisch</option>
+                        <option value="japanese">🍣 Japanisch</option>
+                        <option value="chinese">🥢 Chinesisch</option>
+                        <option value="indian">🍛 Indisch</option>
+                        <option value="mexican">🌮 Mexikanisch</option>
+                        <option value="thai">🍜 Thailändisch</option>
+                        <option value="french">🥐 Französisch</option>
+                        <option value="greek">🥙 Griechisch</option>
+                        <option value="korean">🍳 Koreanisch</option>
+                        <option value="vietnamese">🍲 Vietnamesisch</option>
+                        <option value="turkish">🥙 Türkisch</option>
+                        <option value="spanish">🥘 Spanisch</option>
+                        <option value="american">🍔 Amerikanisch</option>
+                        <option value="vegetarian">🥗 Vegetarisch</option>
+                        <option value="vegan">🌱 Vegan</option>
+                        <option value="seafood">🐟 Meeresfrüchte</option>
+                        <option value="barbecue">🔥 Grill/BBQ</option>
+                        <option value="fastfood">🍟 Fast Food</option>
+                        <option value="dessert">🍰 Desserts</option>
+                        <option value="cafe">☕ Café</option>
+                    </select>
+                    <button id="addCategoryBtn" class="btn btn-primary">➕ Hinzufügen</button>
+                </div>
+            </section>
+
+            <!-- Empfehlungen basierend auf Profil -->
+            
+
+            <!-- Profil Aktionen -->
+            <section class="profile-actions">
+                <div class="action-buttons">
+                    <button id="saveProfileBtn" class="btn btn-primary">💾 Profil speichern</button>
+                    <button id="resetProfileBtn" class="btn btn-secondary">🔄 Zurücksetzen</button>
+                    <button id="exportProfileBtn" class="btn btn-outline">📤 Profil exportieren</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <ul class="footer-nav">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="imprint.html">Impressum</a></li>
+            <li><a href="privacy.html">Datenschutz</a></li>
+            <li><a href="contact.html">Kontakt</a></li>
+        </ul>
+    </footer>
+
+    <script src="../js/geschmacksprofil.js"></script>
+</body>
+</html>

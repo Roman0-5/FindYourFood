@@ -1,0 +1,10 @@
+@import "./styles.css";
+
+.form-container {
+    max-width: 400px;
+    margin: var(--spacing-lg) auto;
+    padding: var(--spacing-md);
+    background: var(--color-secondary);
+    border-radius: .5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}

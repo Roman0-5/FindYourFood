@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - FindYourFood</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/login.css">
+    <link rel="stylesheet" href="../css/accountDropdown.css">
+    <script src="../js/accountDropdown.js" defer></script>
+    <script src="../js/navbar.js" defer></script>
+</head>
+<body>
+    
+<div id="navbarContainer"></div>
+
+    <!-- Header mit Logo (Branding wie auf StartSite) -->
+    <header class="branding">
+        <h1 class="headline">
+            <span class="highlight">Find</span>
+            <span class="your">Your</span>
+            <span class="highlight block">Food</span>
+        </h1>
+        <p class="slogan">
+            <span class="subtle">Less</span>
+            <span class="action">scrolling</span>.
+            <span class="subtle">More</span>
+            <span class="action">eating</span>.
+        </p>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Login Container -->
+        <div class="login-container">
+            <!-- Session Status anzeigen -->
+            
+            <div id="statusMessage" style="display: none;"></div>
+
+            <!-- Login Form -->
+            <div id="loginForm">
+                <h1 class="login-title">Anmelden</h1>
+
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label" for="username">Benutzername</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            class="form-input"
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Passwort</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-input"
+                            required
+                        />
+                    </div>
+
+                    <!-- Loading Animation -->
+                    <div class="loading" id="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Anmeldung läuft...</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="loginBtn">
+                        🔑 Anmelden
+                    </button>
+                </form>
+            </div>
+
+            <!-- Logout Section (wird angezeigt wenn angemeldet) -->
+            <div id="logoutSection" style="display: none;">
+                <h1 class="login-title">Willkommen zurück!</h1>
+                <p style="text-align: center; margin-bottom: 1.5rem; font-family: sans-serif;">
+                    Du bist bereits angemeldet.
+                </p>
+
+                <button class="btn btn-secondary" onclick="logout()">
+                    🚪 Abmelden
+                </button>
+
+                <a href="/" class="btn btn-primary" style="text-decoration: none; display: block; text-align: center;">
+                    🏠 Zur Startseite
+                </a>
+            </div>
+
+            <!-- Links -->
+            <div class="link-group">
+                <a href="createAccount.html" class="link">Account erstellen</a>
+                <a href="/" class="link">Zur Startseite</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer wie auf StartSite -->
+    <footer>
+        <ul class="footer-nav">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="imprint.html">Impressum</a></li>
+            <li><a href="privacy.html">Datenschutz</a></li>
+            <li><a href="contact.html">Kontakt</a></li>
+        </ul>
+    </footer>
+
+    <script src="/js/login.js" defer></script>
+</body>
+</html>
