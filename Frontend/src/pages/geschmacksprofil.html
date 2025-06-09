@@ -8,62 +8,11 @@
     <link rel="stylesheet" href="../css/geschmacksprofil.css">
     <link rel="stylesheet" href="../css/accountDropdown.css">
     <script src="../js/accountDropdown.js" defer></script>
+    <script src="../js/navbar.js" defer></script>
 </head>
 <body>
-    <!-- Navigation mit Account Dropdown -->
-    <nav class="main-nav">
-        <ul>
-            <li><a href="StartSite.html">🏠 Home</a></li>
+    <div id="navbarContainer"></div>
 
-            <!-- Account Dropdown -->
-            <li class="dropdown" id="accountDropdown">
-                <!-- Wenn NICHT eingeloggt: Account Button -->
-                <button class="dropdown-btn" id="accountBtn">
-                    👤 Account
-                    <span class="dropdown-arrow">▼</span>
-                </button>
-
-                <!-- Wenn NICHT eingeloggt: Dropdown Content -->
-                <div class="dropdown-content" id="accountDropdownContent" style="display: none !important;">
-                    <a href="login.html" class="dropdown-item">
-                        <span class="dropdown-item-icon">🔑</span>
-                        Anmelden
-                    </a>
-                    <a href="createAccount.html" class="dropdown-item">
-                        <span class="dropdown-item-icon">✨</span>
-                        Account erstellen
-                    </a>
-                </div>
-
-                <!-- Wenn EINGELOGGT: User Info -->
-                <div class="user-info" id="userInfo" style="display: none;">
-                    <div class="user-avatar" id="userAvatar">A</div>
-                    <span class="user-name" id="userName">Admin</span>
-                    <span class="dropdown-arrow">▼</span>
-                </div>
-
-                <!-- Wenn EINGELOGGT: Dropdown Content -->
-                <div class="dropdown-content" id="userDropdownContent" style="display: none !important;">
-                    <a href="geschmacksprofil.html" class="dropdown-item" id="geschmacksprofil">
-                        <span class="dropdown-item-icon">🍽️</span>
-                        Geschmacksprofil
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">⭐</span>
-                        Meine Favoriten
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">⚙️</span>
-                        Einstellungen
-                    </a>
-                    <a href="#" class="dropdown-item logout-item" id="logoutBtn">
-                        <span class="dropdown-item-icon">🚪</span>
-                        Abmelden
-                    </a>
-                </div>
-            </li>
-        </ul>
-    </nav>
 
     <!-- Header mit Logo -->
     <header class="branding">
