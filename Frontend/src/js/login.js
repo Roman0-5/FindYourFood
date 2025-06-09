@@ -57,7 +57,12 @@ function updateUIForLoggedOutUser() {
   const loginForm = document.getElementById("loginForm");
   const logoutSection = document.getElementById("logoutSection");
 
-  
+  sessionContent.innerHTML = `
+    <strong>Ich kenn dich nicht</strong><br>
+    <small>Bitte melden sie sich an</small>
+  `;
+  loginForm.style.display = "block";
+  logoutSection.style.display = "none";
 }
 // Form initialisieren
 function initializeForm() {
