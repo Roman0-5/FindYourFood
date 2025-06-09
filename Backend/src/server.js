@@ -1,8 +1,7 @@
 // === Fertige server.js ===
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { findUserByUsername, createUser, verifyPassword } from '../database/database.js';
-//import * as db from '../database/database.js';
+import { findUserByUsername, createUser, verifyPassword, updateUser, deleteUserById, openDb, initializePreferencesTable } from '../database/database.js';
 import bcrypt from 'bcryptjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -18,24 +17,16 @@ console.log(' API_KEY geladen:', process.env.API_KEY); // DEBUG
 import jwt from 'jsonwebtoken';
 import express from 'express';
 import fetch from 'node-fetch';
-//import session from 'express-session'; - löschen wenn JWT implementiert
 import swaggerUi from 'swagger-ui-express';
 import { swaggerDocument } from './swagger.js';
-import { updateUser } from '../database/database.js';
-import { deleteUserById } from '../database/database.js';
-
-// Für __dirname in ES-Modulen
-
 
 const app = express();
 const PORT = 3000;
 app.use(express.json());
 
-
 // === Debug Logs ===
 console.log(' ACCESS_TOKEN_SECRET:', process.env.ACCESS_TOKEN_SECRET ? 'OK' : 'FEHLT!');
 console.log(' API_KEY geladen:', process.env.API_KEY || 'FEHLT!');
-
 
 // === JWT Middleware ===
 function authenticateJWT (req, res, next) {
@@ -50,7 +41,6 @@ function authenticateJWT (req, res, next) {
     next(); //Zugriff gewähren
   });
 }
-
 
 //neue Login Route - kein Hardcode mehr
 app.post('/login', async (req, res) => {
@@ -79,17 +69,18 @@ app.post('/login', async (req, res) => {
   }
   console.log("🔑 JWT Token generiert für Benutzer:", username);
 });
-// In server.js - einfach hinzufügen
+
+// Logout Route
 app.post('/logout', (req, res) => {
   res.json({ message: 'Logout erfolgreich' });
 });
+
 //Login Status prüfen
 app.get('/me', authenticateJWT, (req, res) => {
   res.json({ loggedIn: true, user: req.user });
 });
 
 // GET /api/users/me – Profil des eingeloggten Nutzers
-
 app.get('/api/users/me', authenticateJWT, async (req, res) => {
   try {
     const user = await findUserByUsername(req.user.name);
@@ -108,7 +99,6 @@ app.get('/api/users/me', authenticateJWT, async (req, res) => {
     res.status(500).json({ message: 'Interner Serverfehler' });
   }
 });
-
 
 //Route für Registrierung
 app.post('/register', async (req, res) => {
@@ -146,8 +136,6 @@ app.post('/register', async (req, res) => {
   }
 });
 
-
-
 // === Swagger UI ===
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -156,6 +144,7 @@ app.use(express.static(path.join(__dirname, '../../Frontend/src/pages'))); // Zw
 app.use('/js', express.static(path.join(__dirname, '../../Frontend/src/js')));
 app.use('/css', express.static(path.join(__dirname, '../../Frontend/src/css')));
 app.use('/partials', express.static(path.join(__dirname, '../../Frontend/src/partials')));
+
 // === HTML-Seiten Routing ===
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../../Frontend/src/pages', 'StartSite.html')); // Zwei Ebenen hoch
@@ -170,7 +159,6 @@ app.get('/createAccount.html', (req, res) => {
 });
 
 // === API Endpoint ===
-// server.js - KORRIGIERT
 app.get('/search', async (req, res) => {
   console.log('🔍 Search Request received:', req.query);
   
@@ -254,14 +242,22 @@ app.delete('/api/users/me', authenticateJWT, async (req, res) => {
     res.status(500).json({ message: 'Fehler beim Löschen des Accounts' });
   }
 });
-// === GESCHMACKSPROFIL API ROUTEN ===
-// Füge diese Routen zu deiner server.js hinzu (nach den anderen API-Routen)
+
+// === GESCHMACKSPROFIL API ROUTEN MIT ECHTER DATENBANK ===
 
 // GET /api/preferences - Präferenzen laden
 app.get('/api/preferences', authenticateJWT, async (req, res) => {
   try {
-    // Für jetzt einfach leeres Array zurückgeben (später mit echter DB)
-    res.json({ success: true, preferences: [] });
+    const db = await openDb();
+    const preferences = await db.all(
+      'SELECT cuisine_type FROM user_preferences WHERE user_id = ?',
+      [req.user.id]
+    );
+    
+    const cuisineTypes = preferences.map(pref => pref.cuisine_type);
+    console.log('📥 Präferenzen geladen für User:', req.user.name, '→', cuisineTypes);
+    
+    res.json({ success: true, preferences: cuisineTypes });
   } catch (err) {
     console.error('❌ Fehler beim Laden der Präferenzen:', err);
     res.status(500).json({ success: false, message: 'Serverfehler' });
@@ -273,8 +269,30 @@ app.post('/api/preferences', authenticateJWT, async (req, res) => {
   const { cuisine_type } = req.body;
   console.log('📥 Neue Präferenz hinzufügen:', cuisine_type, 'für User:', req.user.name);
   
+  if (!cuisine_type) {
+    return res.status(400).json({ success: false, message: 'cuisine_type fehlt' });
+  }
+  
   try {
-    // Für jetzt einfach success zurückgeben (später echte DB-Operation)
+    const db = await openDb();
+    
+    // Prüfen ob bereits vorhanden
+    const existing = await db.get(
+      'SELECT id FROM user_preferences WHERE user_id = ? AND cuisine_type = ?',
+      [req.user.id, cuisine_type]
+    );
+    
+    if (existing) {
+      return res.status(409).json({ success: false, message: 'Präferenz bereits vorhanden' });
+    }
+    
+    // Neue Präferenz hinzufügen
+    await db.run(
+      'INSERT INTO user_preferences (user_id, cuisine_type) VALUES (?, ?)',
+      [req.user.id, cuisine_type]
+    );
+    
+    console.log('✅ Präferenz gespeichert:', cuisine_type);
     res.json({ success: true });
   } catch (err) {
     console.error('❌ Fehler beim Hinzufügen der Präferenz:', err);
@@ -288,7 +306,17 @@ app.delete('/api/preferences/:cuisine', authenticateJWT, async (req, res) => {
   console.log('🗑️ Präferenz entfernen:', cuisine, 'für User:', req.user.name);
   
   try {
-    // Für jetzt einfach success zurückgeben (später echte DB-Operation)
+    const db = await openDb();
+    const result = await db.run(
+      'DELETE FROM user_preferences WHERE user_id = ? AND cuisine_type = ?',
+      [req.user.id, cuisine]
+    );
+    
+    if (result.changes === 0) {
+      return res.status(404).json({ success: false, message: 'Präferenz nicht gefunden' });
+    }
+    
+    console.log('✅ Präferenz entfernt:', cuisine);
     res.json({ success: true });
   } catch (err) {
     console.error('❌ Fehler beim Entfernen der Präferenz:', err);
@@ -301,9 +329,35 @@ app.put('/api/preferences', authenticateJWT, async (req, res) => {
   const { preferences } = req.body;
   console.log('💾 Präferenzen speichern:', preferences, 'für User:', req.user.name);
   
+  if (!Array.isArray(preferences)) {
+    return res.status(400).json({ success: false, message: 'preferences muss ein Array sein' });
+  }
+  
   try {
-    // Für jetzt einfach success zurückgeben (später echte DB-Operation)
-    res.json({ success: true });
+    const db = await openDb();
+    
+    // Transaction starten
+    await db.run('BEGIN TRANSACTION');
+    
+    try {
+      // Alle alten Präferenzen löschen
+      await db.run('DELETE FROM user_preferences WHERE user_id = ?', [req.user.id]);
+      
+      // Neue Präferenzen einfügen
+      for (const cuisine_type of preferences) {
+        await db.run(
+          'INSERT INTO user_preferences (user_id, cuisine_type) VALUES (?, ?)',
+          [req.user.id, cuisine_type]
+        );
+      }
+      
+      await db.run('COMMIT');
+      console.log('✅ Alle Präferenzen aktualisiert');
+      res.json({ success: true });
+    } catch (err) {
+      await db.run('ROLLBACK');
+      throw err;
+    }
   } catch (err) {
     console.error('❌ Fehler beim Speichern der Präferenzen:', err);
     res.status(500).json({ success: false, message: 'Serverfehler' });
@@ -315,7 +369,13 @@ app.delete('/api/preferences', authenticateJWT, async (req, res) => {
   console.log('🔄 Alle Präferenzen zurücksetzen für User:', req.user.name);
   
   try {
-    // Für jetzt einfach success zurückgeben (später echte DB-Operation)
+    const db = await openDb();
+    const result = await db.run(
+      'DELETE FROM user_preferences WHERE user_id = ?',
+      [req.user.id]
+    );
+    
+    console.log(`✅ ${result.changes} Präferenzen gelöscht`);
     res.json({ success: true });
   } catch (err) {
     console.error('❌ Fehler beim Zurücksetzen der Präferenzen:', err);
@@ -328,9 +388,15 @@ app.get('/api/preferences/export', authenticateJWT, async (req, res) => {
   console.log('📤 Präferenzen exportieren für User:', req.user.name);
   
   try {
+    const db = await openDb();
+    const preferences = await db.all(
+      'SELECT cuisine_type FROM user_preferences WHERE user_id = ?',
+      [req.user.id]
+    );
+    
     const exportData = {
       user: req.user.name,
-      preferences: [], // Für jetzt leer (später aus DB laden)
+      preferences: preferences.map(pref => pref.cuisine_type),
       exportDate: new Date().toISOString()
     };
     
@@ -343,9 +409,21 @@ app.get('/api/preferences/export', authenticateJWT, async (req, res) => {
   }
 });
 
+// Datenbank initialisieren
+async function initializeDatabase() {
+  try {
+    await initializePreferencesTable();
+    console.log('✅ Präferenzen-Tabelle initialisiert');
+  } catch (err) {
+    console.error('❌ Fehler bei DB-Initialisierung:', err);
+  }
+}
 
 // Server starten
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`\n✅ Server läuft unter: http://localhost:${PORT}`);
   console.log(`📚 Swagger-Doku: http://localhost:${PORT}/api-docs`);
+  
+  // Datenbank initialisieren
+  await initializeDatabase();
 });
