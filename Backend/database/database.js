@@ -22,11 +22,14 @@ export async function createUser({username, email, password}) {
   const db = await openDb();
   const hash = await bcrypt.hash(password, 10);
   try {
-    await db.run(
+    const result = await db.run(
       'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
       [username, email, hash]
     );
-    return { success: true };
+    return {
+      success: true,
+      userId: result.lastID
+    };
   } catch (err) {
     if (err.message.includes('UNIQUE')) {
       return { success: false, message: 'Benutzername oder E-Mail existiert bereits' };
@@ -92,4 +95,18 @@ export async function deleteUserById(id) {
     console.error("❌ Fehler in deleteUserById:", err);
     return { success: false, error: err.message };
   }
+}
+// In database.js hinzufügen:
+export async function initializePreferencesTable() {
+  const db = await openDb();
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS user_preferences (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      cuisine_type TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+      UNIQUE(user_id, cuisine_type)
+    )
+  `);
 }

@@ -50,15 +50,39 @@ async function initializeGeschmacksprofil() {
   setupEventListeners();
 }
 
-// GET /session-check
+// JWT Session Check - KORRIGIERT!
 async function checkSession() {
   try {
-    const response = await fetch("/session-check");
-    const data = await response.json();
-    currentUser = data.user;
-    return data;
+    const token = localStorage.getItem("token"); // <- "token" nicht "authToken"
+    console.log("🔍 Token aus localStorage:", token);
+
+    if (!token) {
+      console.log("❌ Kein Token gefunden");
+      return { loggedIn: false, user: null };
+    }
+
+    console.log("📡 Sende Request an /me mit Token");
+
+    const response = await fetch("/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("📨 Response Status:", response.status);
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("✅ User Data erhalten:", data);
+      currentUser = data.user;
+      return { loggedIn: true, user: data.user };
+    } else {
+      console.log("❌ Token ungültig, entferne aus localStorage");
+      localStorage.removeItem("token");
+      return { loggedIn: false, user: null };
+    }
   } catch (error) {
-    console.error("Session check error:", error);
+    console.error("❌ Session check error:", error);
     return { loggedIn: false, user: null };
   }
 }
@@ -113,6 +137,15 @@ function setupEventListeners() {
   }
 }
 
+// === HELPER FUNCTION FOR AUTH HEADERS ===
+function getAuthHeaders() {
+  const token = localStorage.getItem("token"); // <- "token" nicht "authToken"
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+}
+
 // === REST API CALLS ===
 
 // GET /api/preferences
@@ -120,9 +153,7 @@ async function loadUserPreferences() {
   try {
     const response = await fetch("/api/preferences", {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -134,7 +165,6 @@ async function loadUserPreferences() {
     if (data.success) {
       userPreferences = data.preferences || [];
       updatePreferencesDisplay();
-      updateRecommendations();
     }
   } catch (error) {
     console.error("Load preferences error:", error);
@@ -164,9 +194,7 @@ async function addCategory() {
   try {
     const response = await fetch("/api/preferences", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         cuisine_type: selectedCategory,
       }),
@@ -181,7 +209,6 @@ async function addCategory() {
     if (data.success) {
       userPreferences.push(selectedCategory);
       updatePreferencesDisplay();
-      updateRecommendations();
       categorySelect.value = "";
 
       const categoryName =
@@ -207,9 +234,7 @@ async function removeCategory(category) {
       `/api/preferences/${encodeURIComponent(category)}`,
       {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
       }
     );
 
@@ -222,7 +247,7 @@ async function removeCategory(category) {
     if (data.success) {
       userPreferences = userPreferences.filter((pref) => pref !== category);
       updatePreferencesDisplay();
-      updateRecommendations();
+      
 
       const categoryName = categoryMapping[category] || category;
       showStatusMessage("info", `ℹ️ ${categoryName} entfernt.`);
@@ -246,9 +271,7 @@ async function saveProfile() {
   try {
     const response = await fetch("/api/preferences", {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         preferences: userPreferences,
       }),
@@ -283,9 +306,7 @@ async function resetProfile() {
   try {
     const response = await fetch("/api/preferences", {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -297,7 +318,7 @@ async function resetProfile() {
     if (data.success) {
       userPreferences = [];
       updatePreferencesDisplay();
-      updateRecommendations();
+      
       showStatusMessage("info", "🔄 Geschmacksprofil wurde zurückgesetzt.");
     }
   } catch (error) {
@@ -319,9 +340,7 @@ async function exportProfile() {
   try {
     const response = await fetch("/api/preferences/export", {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -378,94 +397,7 @@ function updatePreferencesDisplay() {
   }
 }
 
-// === RECOMMENDATIONS ===
 
-function updateRecommendations() {
-  const recommendationCards = document.getElementById("recommendationCards");
-  const noRecommendations = document.getElementById("noRecommendations");
-
-  if (!recommendationCards || !noRecommendations) return;
-
-  if (userPreferences.length === 0) {
-    recommendationCards.style.display = "none";
-    noRecommendations.style.display = "block";
-    return;
-  }
-
-  recommendationCards.style.display = "grid";
-  noRecommendations.style.display = "none";
-
-  const recommendations = generateRecommendations();
-
-  recommendationCards.innerHTML = recommendations
-    .map(
-      (rec) => `
-        <div class="recommendation-card">
-            <h4>${rec.title}</h4>
-            <p>${rec.description}</p>
-        </div>
-    `
-    )
-    .join("");
-}
-
-function generateRecommendations() {
-  const recommendations = [];
-
-  if (userPreferences.includes("japanese")) {
-    recommendations.push({
-      title: "🍣 Sushi-Restaurants in Wien",
-      description:
-        "Entdecke authentische japanische Küche in deiner Nähe. Perfekt für deine Vorliebe für japanisches Essen!",
-    });
-  }
-
-  if (userPreferences.includes("italian")) {
-    recommendations.push({
-      title: "🍝 Italienische Perlen",
-      description:
-        "Von Pasta bis Pizza - finde die besten italienischen Restaurants, die zu deinem Geschmack passen.",
-    });
-  }
-
-  if (userPreferences.includes("indian")) {
-    recommendations.push({
-      title: "🍛 Indische Gewürze",
-      description:
-        "Scharfe Currys und aromatische Gewürze warten auf dich in den besten indischen Lokalen.",
-    });
-  }
-
-  if (userPreferences.includes("mexican")) {
-    recommendations.push({
-      title: "🌮 Mexikanische Fiesta",
-      description:
-        "Tacos, Burritos und mehr - erlebe die Vielfalt der mexikanischen Küche.",
-    });
-  }
-
-  if (userPreferences.length >= 3) {
-    recommendations.push({
-      title: "🌍 Fusion-Küche",
-      description:
-        "Da du verschiedene Küchen magst, könnten Fusion-Restaurants perfekt für dich sein!",
-    });
-  }
-
-  const notSelected = Object.keys(categoryMapping).filter(
-    (cat) => !userPreferences.includes(cat)
-  );
-  if (notSelected.length > 0) {
-    const randomCuisine =
-      notSelected[Math.floor(Math.random() * notSelected.length)];
-    recommendations.push({
-      title: `✨ Neu entdecken: ${categoryMapping[randomCuisine]}`,
-      description: "Erweitere deinen Horizont und probiere etwas Neues aus!",
-    });
-  }
-
-  return recommendations.slice(0, 4);
-}
 
 // === UTILITY FUNCTIONS ===
 
@@ -508,11 +440,11 @@ window.debugGeschmacksprofil = {
   addTestPreferences: () => {
     userPreferences = ["italian", "japanese", "indian", "mexican"];
     updatePreferencesDisplay();
-    updateRecommendations();
+    
   },
   clearPreferences: () => {
     userPreferences = [];
     updatePreferencesDisplay();
-    updateRecommendations();
+    
   },
 };

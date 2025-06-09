@@ -49,6 +49,7 @@ function initializeAccountDropdown() {
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", handleLogout);
+    
   }
 
   // Geschmacksprofil Event
@@ -243,13 +244,16 @@ function updateNavigationUI(isLoggedIn, user) {
 async function handleLogout(event) {
   event.preventDefault();
   closeDropdown();
-
+  if(!confirm("Bist du sicher, dass du dich abmelden möchtest?")) {
+    return; // Abbrechen, wenn der Nutzer nicht bestätigen möchte
+  }
   try {
     const response = await fetch("/logout", { method: "POST" });
     const result = await response.json();
 
     if (response.ok) {
       // Erfolgreich abgemeldet
+      localStorage.removeItem("token"); // ✅ Richtig
       updateNavigationUI(false, null);
 
       // Optional: Feedback anzeigen

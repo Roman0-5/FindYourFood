@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 import dotenv from 'dotenv';
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 console.log(' ACCESS_TOKEN_SECRET:', process.env.ACCESS_TOKEN_SECRET ? 'Gefunden ' : 'Fehlt ');
 console.log(' API_KEY geladen:', process.env.API_KEY); // DEBUG
@@ -57,6 +57,7 @@ app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
     const user = await findUserByUsername(username);
+    
     if (!user) {
       return res.status(401).json({ message: 'Benutzer nicht gefunden' });
     }
@@ -65,7 +66,8 @@ app.post('/login', async (req, res) => {
     if (!valid) {
       return res.status(401).json({ message: 'Falsches Passwort' });
     }
-
+    console.log("🔍 Login-Versuch für Benutzer:", username);
+    console.log("ID: ", user.id);
     const token = jwt.sign({ name: user.username, id: user.id }, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || '1h',
     });
@@ -75,6 +77,11 @@ app.post('/login', async (req, res) => {
     console.error('❌ Login-Fehler:', err);
     res.status(500).json({ message: 'Serverfehler beim Login' });
   }
+  console.log("🔑 JWT Token generiert für Benutzer:", username);
+});
+// In server.js - einfach hinzufügen
+app.post('/logout', (req, res) => {
+  res.json({ message: 'Logout erfolgreich' });
 });
 //Login Status prüfen
 app.get('/me', authenticateJWT, (req, res) => {
@@ -245,6 +252,94 @@ app.delete('/api/users/me', authenticateJWT, async (req, res) => {
   } catch (err) {
     console.error("❌ Fehler beim Löschen des Accounts:", err);
     res.status(500).json({ message: 'Fehler beim Löschen des Accounts' });
+  }
+});
+// === GESCHMACKSPROFIL API ROUTEN ===
+// Füge diese Routen zu deiner server.js hinzu (nach den anderen API-Routen)
+
+// GET /api/preferences - Präferenzen laden
+app.get('/api/preferences', authenticateJWT, async (req, res) => {
+  try {
+    // Für jetzt einfach leeres Array zurückgeben (später mit echter DB)
+    res.json({ success: true, preferences: [] });
+  } catch (err) {
+    console.error('❌ Fehler beim Laden der Präferenzen:', err);
+    res.status(500).json({ success: false, message: 'Serverfehler' });
+  }
+});
+
+// POST /api/preferences - Präferenz hinzufügen
+app.post('/api/preferences', authenticateJWT, async (req, res) => {
+  const { cuisine_type } = req.body;
+  console.log('📥 Neue Präferenz hinzufügen:', cuisine_type, 'für User:', req.user.name);
+  
+  try {
+    // Für jetzt einfach success zurückgeben (später echte DB-Operation)
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Fehler beim Hinzufügen der Präferenz:', err);
+    res.status(500).json({ success: false, message: 'Serverfehler' });
+  }
+});
+
+// DELETE /api/preferences/:cuisine - Präferenz entfernen  
+app.delete('/api/preferences/:cuisine', authenticateJWT, async (req, res) => {
+  const { cuisine } = req.params;
+  console.log('🗑️ Präferenz entfernen:', cuisine, 'für User:', req.user.name);
+  
+  try {
+    // Für jetzt einfach success zurückgeben (später echte DB-Operation)
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Fehler beim Entfernen der Präferenz:', err);
+    res.status(500).json({ success: false, message: 'Serverfehler' });
+  }
+});
+
+// PUT /api/preferences - Alle Präferenzen aktualisieren
+app.put('/api/preferences', authenticateJWT, async (req, res) => {
+  const { preferences } = req.body;
+  console.log('💾 Präferenzen speichern:', preferences, 'für User:', req.user.name);
+  
+  try {
+    // Für jetzt einfach success zurückgeben (später echte DB-Operation)
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Fehler beim Speichern der Präferenzen:', err);
+    res.status(500).json({ success: false, message: 'Serverfehler' });
+  }
+});
+
+// DELETE /api/preferences - Alle Präferenzen löschen
+app.delete('/api/preferences', authenticateJWT, async (req, res) => {
+  console.log('🔄 Alle Präferenzen zurücksetzen für User:', req.user.name);
+  
+  try {
+    // Für jetzt einfach success zurückgeben (später echte DB-Operation)
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Fehler beim Zurücksetzen der Präferenzen:', err);
+    res.status(500).json({ success: false, message: 'Serverfehler' });
+  }
+});
+
+// GET /api/preferences/export - Präferenzen exportieren
+app.get('/api/preferences/export', authenticateJWT, async (req, res) => {
+  console.log('📤 Präferenzen exportieren für User:', req.user.name);
+  
+  try {
+    const exportData = {
+      user: req.user.name,
+      preferences: [], // Für jetzt leer (später aus DB laden)
+      exportDate: new Date().toISOString()
+    };
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="geschmacksprofil_${req.user.name}.json"`);
+    res.json(exportData);
+  } catch (err) {
+    console.error('❌ Fehler beim Exportieren der Präferenzen:', err);
+    res.status(500).json({ success: false, message: 'Serverfehler' });
   }
 });
 
