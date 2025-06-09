@@ -1,67 +1,54 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>FindYourFood – Create Account</title>
-    <link rel="stylesheet" href="../css/createAccount.css" />
-    <link rel="stylesheet" href="../css/accountDropdown.css" />
-    <link rel="icon" href="/assets/favicon.ico" type="image/x-icon" />
-
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-            href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap"
-            rel="stylesheet"
-    />
-
-    
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account erstellen – FindYourFood</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/login.css" />
+  <link rel="stylesheet" href="../css/createAccount.css" />
+  <script src="../js/accountDropdown.js" defer></script>
+  <script src="../js/navbar.js" defer></script>
 </head>
-
 <body>
-<div class="form-container">
-    <h2>Create Account</h2>
+
+<div id="navbarContainer"></div>
+
+<!-- Branding -->
+<header class="branding">
+  <h1 class="headline"><span class="highlight">Find</span><span class="your">Your</span><span class="highlight block">Food</span></h1>
+  <p class="slogan"><span class="subtle">Less</span> <span class="action">scrolling</span>. <span class="subtle">More</span> <span class="action">eating</span>.</p>
+</header>
+
+<main>
+  <div class="login-container">
+    <h1 class="login-title">Account erstellen</h1>
     <form id="create-account-form">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    placeholder="Dein Benutzername"
-                    required
-            />
-        </div>
-
-        <div class="form-group">
-            <label for="email">E-Mail</label>
-            <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="name@beispiel.de"
-                    required
-            />
-        </div>
-
-        <div class="form-group">
-            <label for="password">Passwort</label>
-            <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Sicheres Passwort"
-                    required
-            />
-        </div>
-
-        <button type="submit" class="btn">Registrieren</button>
-        <button type="reset" class="btn reset-btn">Reset</button>
+      <div class="form-group">
+        <label class="form-label" for="username">Benutzername</label>
+        <input type="text" id="username" class="form-input" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">E-Mail</label>
+        <input type="email" id="email" class="form-input" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Passwort</label>
+        <input type="password" id="password" class="form-input" required />
+      </div>
+      <button type="submit" class="btn btn-primary">✨ Registrieren</button>
+      <button type="reset" class="btn btn-secondary">Zurücksetzen</button>
     </form>
+    <div id="message"></div>
+    <div class="link-group">
+      <a href="login.html" class="link">Bereits registriert? Einloggen</a>
+    </div>
+  </div>
+</main>
 
-    <div id="message" class="mt-md text-center"></div>
-</div>
+<footer>
+  <!-- ... dein Footer wie bei login.html ... -->
+</footer>
 
 <script src="../js/createAccount.js"></script>
 </body>
