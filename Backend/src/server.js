@@ -74,6 +74,10 @@ app.post('/login', async (req, res) => {
 app.post('/logout', (req, res) => {
   res.json({ message: 'Logout erfolgreich' });
 });
+// Route für userSearch.html
+app.get('/userSearch.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../Frontend/src/pages', 'userSearch.html'));
+});
 
 //Login Status prüfen
 app.get('/me', authenticateJWT, (req, res) => {
@@ -408,6 +412,108 @@ app.get('/api/preferences/export', authenticateJWT, async (req, res) => {
     res.status(500).json({ success: false, message: 'Serverfehler' });
   }
 });
+
+app.get('/api/recommendation', authenticateJWT, async (req, res) => {
+    try {
+  
+  
+      const user = await findUserByUsername(req.user.name);
+  
+  
+      if (!user) return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+  
+  
+  
+  
+  
+      const db = await openDb();
+  
+  
+      const prefs = await db.all(
+  
+  
+        'SELECT cuisine_type FROM user_preferences WHERE user_id = ?',
+  
+  
+        [user.id]
+  
+  
+      );
+  
+  
+  
+  
+  
+      if (!prefs || prefs.length === 0) {
+  
+  
+        return res.status(404).json({ message: 'Keine Geschmackspräferenzen gespeichert' });
+  
+  
+      }
+  
+  
+  
+  
+  
+      const randomCuisine = prefs[Math.floor(Math.random() * prefs.length)].cuisine_type;
+  
+  
+      const apiKey = process.env.API_KEY;
+  
+  
+      const city = "Wien"; // oder dynamisch per User/Browser/IP
+  
+  
+  
+  
+  
+      const url = `https://api.tomtom.com/search/2/search/${randomCuisine}%20restaurant%20${city}.json?key=${apiKey}&limit=1`;
+  
+  
+  
+  
+  
+      const response = await fetch(url);
+  
+  
+      const data = await response.json();
+  
+  
+  
+  
+  
+      if (data.results && data.results.length > 0) {
+  
+  
+        res.json({ success: true, restaurant: data.results[0], cuisine: randomCuisine });
+  
+  
+      } else {
+  
+  
+        res.json({ success: false, message: 'Keine passende Empfehlung gefunden' });
+  
+  
+      }
+  
+  
+  
+  
+  
+    } catch (err) {
+  
+  
+      console.error("❌ Fehler bei /api/recommendation:", err);
+  
+  
+      res.status(500).json({ message: 'Fehler bei der Empfehlung' });
+  
+  
+    }
+  
+  
+  });
 
 // Datenbank initialisieren
 async function initializeDatabase() {

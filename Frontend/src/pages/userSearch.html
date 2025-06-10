@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Search Results - FindYourFood</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/results.css">
+    <link rel="stylesheet" href="../css/accountDropdown.css">
+    <link rel="stylesheet" href="../css/userSearch.css">
+    
+    <script src="../js/accountDropdown.js" defer></script>
+    <script src="../js/navbar.js" defer></script>
+    <script src="../js/userSearch.js" defer></script>
+</head>
+<body>
+
+<div id="navbarContainer"></div>
+
+<header class="branding">
+    <h1 class="headline">
+        <span class="highlight">Find</span>
+        <span class="your">Your</span>
+        <span class="highlight block">Food</span>
+    </h1>
+    <p class="slogan">
+        <span class="subtle">Less</span>
+        <span class="action">scrolling</span>.
+        <span class="subtle">More</span>
+        <span class="action">eating</span>.
+    </p>
+</header>
+
+<main>
+    <!-- Login Required Warning -->
+    <div class="login-required" id="loginRequired" style="display: none;">
+        <h2>🔒 Anmeldung erforderlich</h2>
+        <p>Um personalisierte Empfehlungen zu erhalten, musst du dich zuerst anmelden.</p>
+        <a href="login.html" class="btn">🔑 Jetzt anmelden</a>
+        <a href="Results.html${window.location.search}" class="btn btn-secondary">🔍 Normale Suche</a>
+    </div>
+
+    <!-- User Search Content -->
+    <div class="search-sections" id="userSearchContent" style="display: none;">
+        
+        <!-- Personalized Recommendations Section -->
+        <section class="recommendations-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    ⭐ Empfehlungen für dich
+                    <span id="userNameSpan"></span>
+                </h2>
+                <p class="section-description">
+                    Basierend auf deinem Geschmacksprofil haben wir diese Restaurants für dich ausgewählt.
+                </p>
+            </div>
+            
+            <div id="recommendationsContainer">
+                <div class="empty-state">
+                    <h3>🔄 Lade Empfehlungen...</h3>
+                    <p>Einen Moment bitte...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Regular Search Results Section -->
+        <section class="regular-results">
+            <div class="section-header">
+                <h2 class="section-title">
+                    🔍 Suchergebnisse
+                    <span id="searchQuery"></span>
+                </h2>
+                <p class="section-description">
+                    Alle Restaurants die zu deiner Suche passen.
+                </p>
+            </div>
+            
+            <div id="regularResultsContainer">
+                <div class="empty-state">
+                    <h3>🔄 Lade Suchergebnisse...</h3>
+                    <p>Einen Moment bitte...</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    <ul class="footer-nav">
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="imprint.html">Impressum</a></li>
+        <li><a href="privacy.html">Datenschutz</a></li>
+        <li><a href="contact.html">Kontakt</a></li>
+    </ul>
+</footer>
+
+</body>
+</html>
