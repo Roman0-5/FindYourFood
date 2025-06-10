@@ -65,6 +65,74 @@ export const swaggerDocument = {
           },
         },
       },
+      LoginRequest: {
+        type: "object",
+        required: ["username", "password"],
+        properties: {
+          username: { type: "string", example: "testuser" },
+          password: {
+            type: "string",
+            format: "password",
+            example: "sicheresPasswort123",
+          },
+        },
+      },
+      RegisterRequest: {
+        type: "object",
+        required: ["username", "email", "password"],
+        properties: {
+          username: { type: "string", example: "testuser" },
+          email: {
+            type: "string",
+            format: "email",
+            example: "test@example.com",
+          },
+          password: {
+            type: "string",
+            format: "password",
+            example: "sicheresPasswort123",
+          },
+        },
+      },
+      TokenResponse: {
+        type: "object",
+        properties: {
+          message: { type: "string", example: "Login erfolgreich" },
+          token: {
+            type: "string",
+            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          },
+        },
+      },
+      RecommendationResponse: {
+        type: "object",
+        properties: {
+          success: { type: "boolean", example: true },
+          restaurant: {
+            type: "object",
+            properties: {
+              poi: {
+                type: "object",
+                properties: {
+                  name: { type: "string", example: "Pizzeria da Mario" },
+                  phone: { type: "string", example: "+43 1 234567" },
+                  categories: { type: "array", items: { type: "string" } },
+                },
+              },
+              address: {
+                type: "object",
+                properties: {
+                  freeformAddress: {
+                    type: "string",
+                    example: "Stephansplatz 1, 1010 Wien",
+                  },
+                },
+              },
+            },
+          },
+          cuisine: { type: "string", example: "italian" },
+        },
+      },
     },
   },
   security: [{ bearerAuth: [] }],
@@ -78,23 +146,7 @@ export const swaggerDocument = {
           required: true,
           content: {
             "application/json": {
-              schema: {
-                type: "object",
-                required: ["username", "email", "password"],
-                properties: {
-                  username: { type: "string", example: "testuser" },
-                  email: {
-                    type: "string",
-                    format: "email",
-                    example: "test@example.com",
-                  },
-                  password: {
-                    type: "string",
-                    format: "password",
-                    example: "sicheresPasswort123",
-                  },
-                },
-              },
+              schema: { $ref: "#/components/schemas/RegisterRequest" },
             },
           },
         },
@@ -103,13 +155,7 @@ export const swaggerDocument = {
             description: "Benutzer erfolgreich erstellt",
             content: {
               "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    message: { type: "string", example: "Benutzer erstellt" },
-                    token: { type: "string", example: "eyJhbGciOi..." },
-                  },
-                },
+                schema: { $ref: "#/components/schemas/TokenResponse" },
               },
             },
           },
@@ -129,18 +175,7 @@ export const swaggerDocument = {
           required: true,
           content: {
             "application/json": {
-              schema: {
-                type: "object",
-                required: ["username", "password"],
-                properties: {
-                  username: { type: "string", example: "testuser" },
-                  password: {
-                    type: "string",
-                    format: "password",
-                    example: "sicheresPasswort123",
-                  },
-                },
-              },
+              schema: { $ref: "#/components/schemas/LoginRequest" },
             },
           },
         },
@@ -149,13 +184,7 @@ export const swaggerDocument = {
             description: "Login erfolgreich",
             content: {
               "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    message: { type: "string", example: "Login erfolgreich" },
-                    token: { type: "string", example: "eyJhbGciOi..." },
-                  },
-                },
+                schema: { $ref: "#/components/schemas/TokenResponse" },
               },
             },
           },
@@ -193,7 +222,7 @@ export const swaggerDocument = {
     "/me": {
       get: {
         tags: ["Authentication"],
-        summary: "Login-Status prüfen",
+        summary: "Login-Status und Benutzerinformationen prüfen",
         security: [{ bearerAuth: [] }],
         responses: {
           200: {
@@ -225,7 +254,7 @@ export const swaggerDocument = {
     "/api/users/me": {
       get: {
         tags: ["User Management"],
-        summary: "Profil des aktuell eingeloggten Nutzers",
+        summary: "Profil des aktuell eingeloggten Nutzers abrufen",
         security: [{ bearerAuth: [] }],
         responses: {
           200: {
@@ -259,9 +288,14 @@ export const swaggerDocument = {
                 type: "object",
                 properties: {
                   username: { type: "string", example: "neuerName" },
-                  email: { type: "string", example: "neu@mail.com" },
+                  email: {
+                    type: "string",
+                    format: "email",
+                    example: "neu@mail.com",
+                  },
                   password: {
                     type: "string",
+                    format: "password",
                     example: "NeuesSicheresPasswort123",
                   },
                 },
@@ -270,9 +304,22 @@ export const swaggerDocument = {
           },
         },
         responses: {
-          200: { description: "Profil erfolgreich aktualisiert" },
+          200: {
+            description: "Profil erfolgreich aktualisiert",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string", example: "Profil aktualisiert" },
+                  },
+                },
+              },
+            },
+          },
           400: { description: "Fehlende oder ungültige Felder" },
           401: { description: "Unauthorized – Kein gültiger Token" },
+          404: { description: "Benutzer nicht gefunden" },
           500: { description: "Interner Serverfehler" },
         },
       },
@@ -296,8 +343,10 @@ export const swaggerDocument = {
             },
           },
           401: { description: "Unauthorized – Kein oder ungültiger Token" },
-          404: { description: "Benutzer nicht gefunden" },
-          500: { description: "Fehler beim Löschen" },
+          404: {
+            description: "Benutzer nicht gefunden oder Fehler beim Löschen",
+          },
+          500: { description: "Fehler beim Löschen des Accounts" },
         },
       },
     },
@@ -326,19 +375,23 @@ export const swaggerDocument = {
             name: "category",
             in: "query",
             schema: { type: "string", example: "7315025" },
-            description: "Kategorie-ID (optional)",
+            description: "TomTom Kategorie-ID (optional)",
           },
           {
             name: "limit",
             in: "query",
-            schema: { type: "integer", example: 5 },
-            description: "Anzahl der Ergebnisse",
+            schema: { type: "integer", example: 5, default: 5 },
+            description: "Anzahl der Ergebnisse (Standard: 5)",
           },
           {
             name: "openingHours",
             in: "query",
-            schema: { type: "string", example: "any" },
-            description: "Öffnungszeiten-Filter",
+            schema: {
+              type: "string",
+              example: "any",
+              enum: ["any", "nextSevenDays"],
+            },
+            description: "Öffnungszeiten-Filter (Standard: any)",
           },
         ],
         responses: {
@@ -410,7 +463,9 @@ export const swaggerDocument = {
               },
             },
           },
+          400: { description: "cuisine_type fehlt" },
           401: { description: "Unauthorized" },
+          409: { description: "Präferenz bereits vorhanden" },
           500: { description: "Serverfehler" },
         },
       },
@@ -425,6 +480,7 @@ export const swaggerDocument = {
             "application/json": {
               schema: {
                 type: "object",
+                required: ["preferences"],
                 properties: {
                   preferences: {
                     type: "array",
@@ -450,6 +506,7 @@ export const swaggerDocument = {
               },
             },
           },
+          400: { description: "preferences muss ein Array sein" },
           401: { description: "Unauthorized" },
           500: { description: "Serverfehler" },
         },
@@ -508,6 +565,7 @@ export const swaggerDocument = {
             },
           },
           401: { description: "Unauthorized" },
+          404: { description: "Präferenz nicht gefunden" },
           500: { description: "Serverfehler" },
         },
       },
@@ -520,7 +578,8 @@ export const swaggerDocument = {
         security: [{ bearerAuth: [] }],
         responses: {
           200: {
-            description: "Export erfolgreich",
+            description:
+              "Export erfolgreich - Datei wird als Download bereitgestellt",
             content: {
               "application/json": {
                 schema: {
@@ -541,9 +600,88 @@ export const swaggerDocument = {
                 },
               },
             },
+            headers: {
+              "Content-Disposition": {
+                description: "Dateiname für Download",
+                schema: {
+                  type: "string",
+                  example:
+                    'attachment; filename="geschmacksprofil_testuser.json"',
+                },
+              },
+            },
           },
           401: { description: "Unauthorized" },
           500: { description: "Serverfehler" },
+        },
+      },
+    },
+
+    "/api/recommendation": {
+      get: {
+        tags: ["Empfehlungen"],
+        summary:
+          "Personalisierte Restaurant-Empfehlung basierend auf Geschmacksprofil",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Empfehlung erfolgreich generiert",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/RecommendationResponse" },
+              },
+            },
+          },
+          401: { description: "Unauthorized" },
+          404: {
+            description:
+              "Benutzer nicht gefunden oder keine Geschmackspräferenzen gespeichert",
+          },
+          500: { description: "Fehler bei der Empfehlung" },
+        },
+      },
+    },
+
+    "/": {
+      get: {
+        tags: ["Static Pages"],
+        summary: "Hauptseite (StartSite.html)",
+        security: [],
+        responses: {
+          200: { description: "HTML-Seite erfolgreich geladen" },
+        },
+      },
+    },
+
+    "/Results.html": {
+      get: {
+        tags: ["Static Pages"],
+        summary: "Suchergebnisse-Seite",
+        security: [],
+        responses: {
+          200: { description: "HTML-Seite erfolgreich geladen" },
+        },
+      },
+    },
+
+    "/createAccount.html": {
+      get: {
+        tags: ["Static Pages"],
+        summary: "Account-Erstellung-Seite",
+        security: [],
+        responses: {
+          200: { description: "HTML-Seite erfolgreich geladen" },
+        },
+      },
+    },
+
+    "/userSearch.html": {
+      get: {
+        tags: ["Static Pages"],
+        summary: "Benutzer-spezifische Suchseite mit Empfehlungen",
+        security: [],
+        responses: {
+          200: { description: "HTML-Seite erfolgreich geladen" },
         },
       },
     },

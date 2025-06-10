@@ -1,34 +1,26 @@
-// === ACCOUNT DROPDOWN FUNCTIONALITY ===
+// === VERBESSERTER ACCOUNT DROPDOWN CODE ===
 
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("Account Dropdown JS loaded"); // Debug
+  console.log("Account Dropdown JS loaded");
   initializeAccountDropdown();
   checkSessionForNavigation();
 });
 
 // === DROPDOWN INITIALIZATION ===
-
 function initializeAccountDropdown() {
   const dropdown = document.getElementById("accountDropdown");
   const accountBtn = document.getElementById("accountBtn");
   const userInfo = document.getElementById("userInfo");
 
-  console.log("Initializing dropdown...", { dropdown, accountBtn, userInfo }); // Debug
+  console.log("Initializing dropdown...", { dropdown, accountBtn, userInfo });
 
-  // Click Event für Account Button
+  // Click Events für beide Buttons
   if (accountBtn) {
-    accountBtn.addEventListener("click", function (event) {
-      console.log("Account button clicked"); // Debug
-      toggleDropdown(event);
-    });
+    accountBtn.addEventListener("click", toggleDropdown);
   }
 
-  // Click Event für User Info (wenn eingeloggt)
   if (userInfo) {
-    userInfo.addEventListener("click", function (event) {
-      console.log("User info clicked"); // Debug
-      toggleDropdown(event);
-    });
+    userInfo.addEventListener("click", toggleDropdown);
   }
 
   // Schließe Dropdown wenn außerhalb geklickt wird
@@ -45,95 +37,76 @@ function initializeAccountDropdown() {
     }
   });
 
-  // Logout Event
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", handleLogout);
-    
-  }
-
-  // Geschmacksprofil Event
-  const geschmacksprofilBtn = document.getElementById("geschmacksprofil");
-  if (geschmacksprofilBtn) {
-    geschmacksprofilBtn.addEventListener("click", handleGeschmacksprofil);
-  }
+  // Event Listeners für Dropdown-Aktionen
+  setupDropdownActions();
 }
 
-// === DROPDOWN TOGGLE FUNCTIONS ===
-
+// === VEREINFACHTE TOGGLE FUNCTION ===
 function toggleDropdown(event) {
   event.preventDefault();
   event.stopPropagation();
 
-  console.log("Toggle dropdown called"); // Debug
+  console.log("Toggle dropdown called");
 
   const dropdown = document.getElementById("accountDropdown");
-  const accountDropdownContent = document.getElementById(
-    "accountDropdownContent"
-  );
-  const userDropdownContent = document.getElementById("userDropdownContent");
 
-  // Bestimme welches Dropdown aktiv ist (basierend auf Sichtbarkeit der Parent-Elemente)
-  let activeDropdown = null;
+  // Finde das aktive Dropdown basierend auf sichtbaren Buttons
+  const activeDropdown = getActiveDropdownContent();
 
-  // Prüfe Account Dropdown (wenn Account Button sichtbar ist)
-  const accountBtn = document.getElementById("accountBtn");
-  if (accountBtn && accountBtn.style.display !== "none") {
-    activeDropdown = accountDropdownContent;
+  if (!activeDropdown) {
+    console.warn("Kein aktives Dropdown gefunden");
+    return;
   }
 
-  // Prüfe User Dropdown (wenn User Info sichtbar ist)
-  const userInfo = document.getElementById("userInfo");
-  if (userInfo && userInfo.style.display === "flex") {
-    activeDropdown = userDropdownContent;
-  }
-
-  console.log("Active dropdown:", activeDropdown); // Debug
-
-  if (activeDropdown) {
-    if (activeDropdown.classList.contains("show")) {
-      closeDropdown();
-    } else {
-      openDropdown();
-    }
+  // EINFACHE TOGGLE-LOGIK
+  if (activeDropdown.classList.contains("show")) {
+    closeDropdown();
+  } else {
+    openDropdown(activeDropdown);
   }
 }
 
-function openDropdown() {
-  console.log("Opening dropdown"); // Debug
-
-  const dropdown = document.getElementById("accountDropdown");
+// === HELPER: AKTIVES DROPDOWN FINDEN ===
+function getActiveDropdownContent() {
+  const accountBtn = document.getElementById("accountBtn");
+  const userInfo = document.getElementById("userInfo");
   const accountDropdownContent = document.getElementById(
     "accountDropdownContent"
   );
   const userDropdownContent = document.getElementById("userDropdownContent");
-  const accountBtn = document.getElementById("accountBtn");
-  const userInfo = document.getElementById("userInfo");
 
-  // Bestimme welches Dropdown geöffnet werden soll
-  let targetDropdown = null;
-
-  // NEUE LOGIK: Prüfe welcher Button/Info sichtbar ist
+  // Prüfe welcher Button sichtbar ist
   if (accountBtn && accountBtn.style.display !== "none") {
-    // Account Button ist sichtbar -> Account Dropdown öffnen
-    targetDropdown = accountDropdownContent;
+    return accountDropdownContent;
   } else if (userInfo && userInfo.style.display === "flex") {
-    // User Info ist sichtbar -> User Dropdown öffnen
-    targetDropdown = userDropdownContent;
+    return userDropdownContent;
   }
 
-  if (targetDropdown && dropdown) {
-    // Setze display auf block um !important zu überschreiben
-    targetDropdown.style.display = "block";
-
-    dropdown.classList.add("active");
-    targetDropdown.classList.add("show");
-    console.log("Dropdown opened:", targetDropdown); // Debug
-  }
+  return null;
 }
 
+// === EINFACHE OPEN FUNCTION ===
+function openDropdown(targetDropdown) {
+  console.log("Opening dropdown:", targetDropdown);
+
+  if (!targetDropdown) return;
+
+  const dropdown = document.getElementById("accountDropdown");
+
+  // Alle Dropdowns erst schließen
+  closeDropdown();
+
+  // Gewähltes Dropdown öffnen
+  targetDropdown.style.display = "block";
+  dropdown.classList.add("active");
+  targetDropdown.classList.add("show");
+
+  console.log("Dropdown opened successfully");
+}
+
+// === CLOSE FUNCTION (unverändert) ===
 function closeDropdown() {
-  console.log("Closing dropdown"); // Debug
+  console.log("Closing dropdown");
 
   const dropdown = document.getElementById("accountDropdown");
   if (!dropdown) return;
@@ -145,7 +118,7 @@ function closeDropdown() {
 
   dropdown.classList.remove("active");
 
-  // Schließe alle Dropdowns komplett
+  // Schließe alle Dropdowns
   if (accountDropdownContent) {
     accountDropdownContent.classList.remove("show");
     accountDropdownContent.style.display = "none";
@@ -157,8 +130,20 @@ function closeDropdown() {
   }
 }
 
-// === SESSION CHECK FÜR NAVIGATION ===
+// === DROPDOWN ACTIONS SETUP ===
+function setupDropdownActions() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", handleLogout);
+  }
 
+  const geschmacksprofilBtn = document.getElementById("geschmacksprofil");
+  if (geschmacksprofilBtn) {
+    geschmacksprofilBtn.addEventListener("click", handleGeschmacksprofil);
+  }
+}
+
+// === SESSION CHECK (unverändert) ===
 async function checkSessionForNavigation() {
   try {
     const res = await fetch("/me", {
@@ -174,12 +159,9 @@ async function checkSessionForNavigation() {
     }
 
     const data = await res.json();
-    const isLoggedIn = data.loggedIn;
-
-    console.log("Session check result:", data); // Debug
-    updateNavigationUI(isLoggedIn, data.user);
+    console.log("Session check result:", data);
+    updateNavigationUI(data.loggedIn, data.user);
     return data;
-
   } catch (error) {
     console.error("Session check error:", error);
     updateNavigationUI(false, null);
@@ -187,6 +169,7 @@ async function checkSessionForNavigation() {
   }
 }
 
+// === NAVIGATION UI UPDATE (unverändert) ===
 function updateNavigationUI(isLoggedIn, user) {
   const accountBtn = document.getElementById("accountBtn");
   const accountDropdownContent = document.getElementById(
@@ -197,13 +180,13 @@ function updateNavigationUI(isLoggedIn, user) {
   const userName = document.getElementById("userName");
   const userAvatar = document.getElementById("userAvatar");
 
-  console.log("Updating navigation UI:", { isLoggedIn, user }); // Debug
+  console.log("Updating navigation UI:", { isLoggedIn, user });
 
-  // ERST ALLE DROPDOWNS SCHLIESSEN UND VERSTECKEN
+  // Erst alle Dropdowns schließen
   closeDropdown();
 
   if (isLoggedIn && user) {
-    // User ist eingeloggt - zeige User Info
+    // User eingeloggt
     if (accountBtn) accountBtn.style.display = "none";
     if (accountDropdownContent) {
       accountDropdownContent.style.display = "none";
@@ -212,20 +195,20 @@ function updateNavigationUI(isLoggedIn, user) {
 
     if (userInfo) userInfo.style.display = "flex";
     if (userDropdownContent) {
-      userDropdownContent.style.display = "none"; // Bereit aber VERSTECKT
+      userDropdownContent.style.display = "none";
       userDropdownContent.classList.remove("show");
     }
 
-    // Update User Info
+    // User Info aktualisieren
     if (userName) userName.textContent = user.name;
     if (userAvatar) userAvatar.textContent = user.name.charAt(0).toUpperCase();
 
     console.log("Navigation updated: User logged in as", user.name);
   } else {
-    // User ist nicht eingeloggt - zeige Account Button
+    // User nicht eingeloggt
     if (accountBtn) accountBtn.style.display = "flex";
     if (accountDropdownContent) {
-      accountDropdownContent.style.display = "none"; // VERSTECKT bis Klick
+      accountDropdownContent.style.display = "none";
       accountDropdownContent.classList.remove("show");
     }
 
@@ -239,27 +222,24 @@ function updateNavigationUI(isLoggedIn, user) {
   }
 }
 
-// === LOGOUT FUNCTIONALITY ===
-
+// === LOGOUT FUNCTIONALITY (unverändert) ===
 async function handleLogout(event) {
   event.preventDefault();
   closeDropdown();
-  if(!confirm("Bist du sicher, dass du dich abmelden möchtest?")) {
-    return; // Abbrechen, wenn der Nutzer nicht bestätigen möchte
+
+  if (!confirm("Bist du sicher, dass du dich abmelden möchtest?")) {
+    return;
   }
+
   try {
     const response = await fetch("/logout", { method: "POST" });
     const result = await response.json();
 
     if (response.ok) {
-      // Erfolgreich abgemeldet
-      localStorage.removeItem("token"); // ✅ Richtig
+      localStorage.removeItem("token");
       updateNavigationUI(false, null);
-
-      // Optional: Feedback anzeigen
       showTemporaryMessage("✅ Erfolgreich abgemeldet", "success");
 
-      // Optional: Zur Startseite weiterleiten (nur wenn nicht bereits dort)
       if (
         window.location.pathname !== "/" &&
         !window.location.pathname.includes("StartSite") &&
@@ -278,26 +258,19 @@ async function handleLogout(event) {
   }
 }
 
-// === GESCHMACKSPROFIL FUNCTIONALITY ===
-
+// === GESCHMACKSPROFIL FUNCTIONALITY (unverändert) ===
 function handleGeschmacksprofil(event) {
   event.preventDefault();
   closeDropdown();
-
-  // Weiterleitung zur Geschmacksprofil-Seite
   window.location.href = "geschmacksprofil.html";
 }
 
-// === UTILITY FUNCTIONS ===
-
-// Temporäre Nachrichten anzeigen
+// === UTILITY FUNCTIONS (unverändert) ===
 function showTemporaryMessage(message, type = "info") {
-  // Erstelle Notification Element
   const notification = document.createElement("div");
   notification.className = `dropdown-notification dropdown-notification-${type}`;
   notification.textContent = message;
 
-  // Styling
   Object.assign(notification.style, {
     position: "fixed",
     top: "20px",
@@ -315,15 +288,12 @@ function showTemporaryMessage(message, type = "info") {
     fontFamily: "sans-serif",
   });
 
-  // Zur Seite hinzufügen
   document.body.appendChild(notification);
 
-  // Einblenden
   setTimeout(() => {
     notification.style.transform = "translateX(0)";
   }, 100);
 
-  // Ausblenden und entfernen
   setTimeout(() => {
     notification.style.transform = "translateX(400px)";
     setTimeout(() => {
@@ -334,7 +304,6 @@ function showTemporaryMessage(message, type = "info") {
   }, 3000);
 }
 
-// Notification Farben
 function getNotificationColor(type) {
   switch (type) {
     case "success":
